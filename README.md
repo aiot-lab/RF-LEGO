@@ -4,10 +4,6 @@
 </div>
 
 <div align="center">
-    Submitted to MobiCom 2026.
-</div>
-
-<div align="center">
 
 </div>
 
