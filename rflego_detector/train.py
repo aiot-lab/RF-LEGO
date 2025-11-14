@@ -163,7 +163,7 @@ if __name__ == "__main__":
                        help="Gamma for learning rate scheduler")
     
     # Model parameters
-    parser.add_argument("--num_layers", type=int, default=3,
+    parser.add_argument("--num_layers", type=int, default=1,
                        help="Number of state space layers")
     parser.add_argument("--hidden_dim", type=int, default=256,
                        help="Hidden dimension of the model")
