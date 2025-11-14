@@ -177,15 +177,15 @@ if __name__ == "__main__":
                        help="Directory containing validation data")
     
     # Training hyperparameters
-    parser.add_argument("--batch_size", type=int, default=256, 
+    parser.add_argument("--batch_size", type=int, default=512, 
                        help="Training batch size")
     parser.add_argument("--num_workers", type=int, default=4, 
                        help="Number of data loader workers")
     parser.add_argument("--total_steps", type=int, default=100000, 
                        help="Total number of training steps")
-    parser.add_argument("--learning_rate", type=float, default=5e-4, 
+    parser.add_argument("--learning_rate", type=float, default=1e-3, 
                        help="Initial learning rate")
-    parser.add_argument("--weight_decay", type=float, default=1e-5, 
+    parser.add_argument("--weight_decay", type=float, default=0.01, 
                        help="Weight decay for regularization")
     parser.add_argument("--step_size", type=int, default=8000, 
                        help="Step size for learning rate scheduler")

@@ -147,7 +147,7 @@ if __name__ == "__main__":
                        help="Directory containing validation data")
     
     # Training hyperparameters
-    parser.add_argument("--batch_size", type=int, default=128,
+    parser.add_argument("--batch_size", type=int, default=512,
                        help="Training batch size")
     parser.add_argument("--num_workers", type=int, default=4,
                        help="Number of data loader workers")
@@ -155,7 +155,7 @@ if __name__ == "__main__":
                        help="Total number of training steps")
     parser.add_argument("--learning_rate", type=float, default=1e-3,
                        help="Initial learning rate")
-    parser.add_argument("--weight_decay", type=float, default=1e-5,
+    parser.add_argument("--weight_decay", type=float, default=0.01,
                        help="Weight decay for regularization")
     parser.add_argument("--step_size", type=int, default=1000,
                        help="Step size for learning rate scheduler")
@@ -173,7 +173,7 @@ if __name__ == "__main__":
                        help="Minimum discretization step size")
     parser.add_argument("--dt_max", type=float, default=1e-1,
                        help="Maximum discretization step size")
-    parser.add_argument("--dropout", type=float, default=0.1,
+    parser.add_argument("--dropout", type=float, default=0.2,
                        help="Dropout probability")
     
     args = parser.parse_args()

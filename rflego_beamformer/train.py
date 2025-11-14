@@ -74,7 +74,7 @@ def rflego_beamformer_train(args):
     )
 
     # Setup optimizer and scheduler
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
 
     # Create checkpoint and log directories
@@ -176,8 +176,10 @@ if __name__ == "__main__":
     # Training hyperparameters
     parser.add_argument("--batch_size", type=int, default=512,
                        help="Training batch size")
-    parser.add_argument("--lr", type=float, default=1e-2,
+    parser.add_argument("--lr", type=float, default=1e-3,
                        help="Initial learning rate")
+    parser.add_argument("--weight_decay", type=float, default=0.01,
+                       help="Weight decay for AdamW optimizer")
     parser.add_argument("--epochs", type=int, default=100,
                        help="Total number of training epochs")
     
@@ -185,8 +187,8 @@ if __name__ == "__main__":
     parser.add_argument("--num_elements", type=int, default=8,
                        help="Number of antenna array elements")
     parser.add_argument("--dictionary_length", type=int, default=121,
-                       help="Dictionary length (number of DoA angles)")
-    parser.add_argument("--num_layers", type=int, default=15,
+                       help="Dictionary length (number of DoA angles, 1-degree resolution)")
+    parser.add_argument("--num_layers", type=int, default=10,
                        help="Number of unfolded ADMM layers")
     
     args = parser.parse_args()
