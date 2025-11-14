@@ -27,22 +27,21 @@ def rflego_beamformer_generate_checkpoint_name(args):
 
 
 def rflego_beamformer_cosine_loss(pred, target):
-    """Cosine similarity loss with sparsity regularization for DoA estimation.
+    """Cosine similarity loss for DoA estimation.
     
     Args:
         pred: Predicted DoA spectrum
         target: Ground truth DoA spectrum
         
     Returns:
-        Combined cosine loss and sparsity penalty
+        Cosine similarity loss
     """
     pred_mag = torch.abs(pred)
     target_mag = torch.abs(target)
     
     cos_sim = torch.nn.functional.cosine_similarity(pred_mag, target_mag, dim=-1)
-    sparsity_loss = torch.norm(pred_mag, dim=-1).mean()
     
-    return 1 - cos_sim.mean() + 0.1 * sparsity_loss
+    return 1 - cos_sim.mean()
 
 
 def rflego_beamformer_train(args):
