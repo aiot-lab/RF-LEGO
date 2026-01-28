@@ -1,2 +1,79 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# uv
+.python-version
+uv.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Linting
+.ruff_cache/
+.mypy_cache/
+
+# macOS
 .DS_Store
-.dist
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+logs/
+*.log
+
+# Checkpoints
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Data (add your data directories)
+data/
+datasets/
+
+# Legacy code backup (optional - remove this line if you want to keep it in git)
+# legacy_backup/
+
+# Misc
+.dist/
+*.tmp
