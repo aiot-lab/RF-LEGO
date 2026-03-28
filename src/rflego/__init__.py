@@ -19,7 +19,7 @@ For more information, see the documentation and examples.
 """
 
 __version__ = "0.1.0"
-__author__ = "Kong-To"
+__author__ = "Luca Yu"
 
 # Re-export main components for convenient access
 from rflego.config import (

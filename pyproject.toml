@@ -5,7 +5,7 @@ description = "RF-LEGO: Lightweight, Efficient, Generalizable, and Optimized neu
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
-    { name = "Kong-To", email = "62915360+1ucayu@users.noreply.github.com" }
+    { name = "Luca Yu", email = "62915360+1ucayu@users.noreply.github.com" }
 ]
 requires-python = ">=3.10"
 keywords = ["rf", "signal-processing", "deep-learning", "beamforming", "doa", "pytorch"]
