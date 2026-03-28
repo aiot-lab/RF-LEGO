@@ -112,7 +112,7 @@ spectrum = model(y, A)  # DoA spectrum: (batch, dict_length)
 
 ```python
 import torch
-from rflego import DetectorConfig, DetectorModel, setup_logger
+from rflego import DetectorConfig, DetectorModel
 
 # Configure and create model
 config = DetectorConfig(
