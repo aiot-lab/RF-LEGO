@@ -106,8 +106,11 @@ class AdaptiveTransition(nn.Module):
         A = torch.as_tensor(A, dtype=torch.float)
         B = torch.as_tensor(B, dtype=torch.float)[:, 0]
 
-        self.register_buffer("A", A)
-        self.register_buffer("B", B)
+        # The paper treats all four state-space matrices A, B, C, and D as
+        # learnable.  HiPPO-LegT provides the initialization, not a constraint
+        # that keeps A or B fixed during optimization.
+        self.A = nn.Parameter(A)
+        self.B = nn.Parameter(B)
         self.register_buffer("I", torch.eye(N))
 
     def forward_mult(self, u: torch.Tensor, delta: torch.Tensor) -> torch.Tensor:
@@ -290,9 +293,6 @@ class StateSpaceLayer(nn.Module):
         log_dt = torch.rand(self.H) * (math.log(dt_max) - math.log(dt_min)) + math.log(dt_min)
         self.register_buffer("dt", torch.exp(log_dt))
 
-        # Cache for Krylov matrix (convolution filter)
-        self.k: torch.Tensor | None = None
-
         # Activation and regularization
         self.activation_fn = nn.GELU()
         self.dropout = nn.Dropout(dropout)
@@ -308,14 +308,13 @@ class StateSpaceLayer(nn.Module):
         Returns:
             Output tensor of shape (L, B, H).
         """
-        # Compute or update Krylov matrix if needed
-        if self.k is None or u.shape[0] > self.k.shape[-1]:
-            A = self.transition.gbt_A(self.dt)
-            B = self.transition.gbt_B(self.dt)
-            self.k = compute_krylov(u.shape[0], A, B)
+
+        A = self.transition.gbt_A(self.dt)
+        B = self.transition.gbt_B(self.dt)
+        k = compute_krylov(u.shape[0], A, B)
 
         # Apply state space convolution
-        y = self._linear_system_from_krylov(u, self.k[..., : u.shape[0]])
+        y = self._linear_system_from_krylov(u, k)
 
         # Apply activation and dropout
         y = self.dropout(self.activation_fn(y))
@@ -408,12 +407,20 @@ class DetectorModel(BaseModel):
         Returns:
             logits: Raw logits before sigmoid (L, B).
         """
-        # Expand input to hidden dimension
+        # Broadcast the scalar sequence over the independent SSM features.  The
+        # state-space layer must see this sample-dependent value *before*
+        # normalization so that the learned B/D paths implement Eq. (11) of
+        # the paper.  Pre-normalizing this broadcast tensor would erase the
+        # scalar because every hidden feature initially has the same value.
         x = x.unsqueeze(-1).expand(-1, -1, self.d)
 
-        # Pass through state space layers with residual connections
-        for layer, norm in zip(self.layers, self.norms):
-            x = x + layer(norm(x))
+        # Feed the raw broadcast profile to the first SSM.  Once that layer has
+        # produced heterogeneous hidden features, later layers can safely use
+        # pre-normalization without collapsing the scalar input.  Keeping the
+        # residual outside LayerNorm also preserves the direct D*x-like path.
+        for layer_index, (layer, norm) in enumerate(zip(self.layers, self.norms)):
+            layer_input = x if layer_index == 0 else norm(x)
+            x = x + layer(layer_input)
 
         # Project to detection logits
         logits = self.fc(x).squeeze(-1)
