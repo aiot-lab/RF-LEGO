@@ -151,7 +151,7 @@
 
   <div class="wrap reveal">
     <figure class="wide">
-      <div class="plate"><img src="static/figures/rflego_core.svg" alt="Core principles of RF-LEGO: modularity, cascadability and interpretability, bridging classical signal processing and deep learning via deep unrolling." loading="lazy"></div>
+      <div class="plate"><img src="static/figures/rflego_core.png" alt="Core principles of RF-LEGO: modularity, cascadability and interpretability, bridging classical signal processing and deep learning via deep unrolling." loading="lazy"></div>
       <figcaption>Core principles of RF-LEGO — <b>Modularity</b>, <b>Cascadability</b>, and <b>Interpretability</b>. RF-LEGO bridges the gap between classical SP and DL for RF sensing via deep unrolling.</figcaption>
     </figure>
   </div>
@@ -204,7 +204,7 @@
     <p>Deep unrolling transforms signal processing techniques into structured neural architectures, combining the adaptability of deep learning with the interpretability and physics of classical methods. Broadly, it falls into two categories.</p>
 
     <figure style="--fw:750px">
-      <div class="plate"><img src="static/figures/deep_unrolling.svg" alt="Two categories of deep unrolling: operator unrolling replaces a signal-processing block with a trainable operator; iterative-optimization unrolling opens the solver loop into trainable layers." loading="lazy"></div>
+      <div class="plate"><img src="static/figures/deep_unrolling.png" alt="Two categories of deep unrolling: operator unrolling replaces a signal-processing block with a trainable operator; iterative-optimization unrolling opens the solver loop into trainable layers." loading="lazy"></div>
       <figcaption><b>S</b>: signal processing block · <b>O</b>: unrolled trainable operator · <b>I</b>: unrolled trainable iterative block.</figcaption>
     </figure>
 
@@ -252,7 +252,7 @@
     </div>
 
     <figure>
-      <div class="plate"><img src="static/figures/lego_ft.svg" alt="RF-LEGO FT architecture: Bluestein's algorithm implements the Fourier transform as a convolution with a chirp; RF-LEGO FT replaces the fixed convolution with a learnable complex-valued convolutional layer." loading="lazy"></div>
+      <div class="plate"><img src="static/figures/lego_ft.png" alt="RF-LEGO FT architecture: Bluestein's algorithm implements the Fourier transform as a convolution with a chirp; RF-LEGO FT replaces the fixed convolution with a learnable complex-valued convolutional layer." loading="lazy"></div>
       <figcaption>(a) Bluestein's algorithm implements the Fourier transform via convolution, where <b>b</b> is the chirp signal and <b>z*</b> its conjugate. (b) RF-LEGO FT replaces the fixed convolution with a learnable convolutional layer. (c) On the mmWave range axis, RF-LEGO FT suppresses sidelobes at low SNR and isolates targets submerged in clutter where the classical algorithm fails.</figcaption>
     </figure>
 
@@ -302,7 +302,7 @@
     </div>
 
     <figure>
-      <div class="plate"><img src="static/figures/lego_bf.svg" alt="RF-LEGO Beamformer architecture: the classical LASSO-ADMM solver versus the unrolled architecture with learnable step sizes, preconditioner and gate." loading="lazy"></div>
+      <div class="plate"><img src="static/figures/lego_bf.png" alt="RF-LEGO Beamformer architecture: the classical LASSO-ADMM solver versus the unrolled architecture with learnable step sizes, preconditioner and gate." loading="lazy"></div>
       <figcaption>(a) The classical LASSO solver using ADMM. (b) The unrolled architecture with learnable parameters. <b>x</b><sup>(t)</sup> is the estimated sparse angular spectrum, <b>z</b><sup>(t)</sup> the auxiliary variable, <b>v</b><sup>(t)</sup> the dual variable, and <b>g</b><sup>(t)</sup> the learned gate that balances historical and current estimates.</figcaption>
     </figure>
 
@@ -353,7 +353,7 @@
     </div>
 
     <figure>
-      <div class="plate"><img src="static/figures/lego_detector.svg" alt="RF-LEGO Detector architecture: classical CFAR with a fixed sliding window versus RF-LEGO's state space model formulation." loading="lazy"></div>
+      <div class="plate"><img src="static/figures/lego_detector.png" alt="RF-LEGO Detector architecture: classical CFAR with a fixed sliding window versus RF-LEGO's state space model formulation." loading="lazy"></div>
       <figcaption>(a) Classical CFAR uses a fixed sliding window. (b) RF-LEGO unrolls the logic into a state space model, where <b>r</b> is the input signal vector, <b>z</b> the learned state vector, and <b>ŝ</b> the detection vector derived from the state.</figcaption>
     </figure>
 
@@ -386,18 +386,6 @@
 
     <div class="note">
       <p><strong>Trained on synthetic data only.</strong> Every module is trained on ~30k synthetic frames — noisy spectra with injected leakage for FT, random-source array snapshots for the Beamformer, superimposed Hann/Hamming peaks at 5–40 dB SNR for the Detector — and then evaluated zero-shot on real measurements. PyTorch, one RTX 4090, AdamW at 1×10⁻³, batch 512, dropout 0.2; cosine-similarity loss for FT and Beamformer, BCE for the Detector.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ============================= DISCUSSION ============================= -->
-<section class="band" id="discussion">
-  <div class="wrap reveal">
-    <h2 class="h">Limitation: information alienation<a class="anchor-link" href="#discussion">#</a></h2>
-    <p>One honest caveat. The unrolled modules perform well downstream, but their learned internal representations may drift away from the clean, canonical outputs that classical algorithms produce with crisp physical definitions. Our interpretability claim is therefore <strong>structure-aligned</strong>, not total: we preserve well-defined input/output contracts and semantically meaningful intermediate outputs, but we do not guarantee full fidelity of every internal learned state inside a block.</p>
-    <p>Balancing physical fidelity against task optimization — getting fully interpretable <em>and</em> high-performance sensing — is the direction we think matters most next.</p>
-    <div class="note">
-      <p><strong>An open invitation.</strong> Three modules are a starting set, not a closed library. The unrolling patterns generalize; we hope the community contributes RF-LEGO blocks for the many other techniques RF sensing depends on.</p>
     </div>
   </div>
 </section>
