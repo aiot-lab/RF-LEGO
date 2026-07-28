@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RF-LEGO: Modularized Signal Processing–Deep Learning Co-Design for RF Sensing via Deep Unrolling</title>
+
+<meta name="description" content="RF-LEGO (ACM MobiCom 2026) turns interpretable signal-processing algorithms into trainable, physics-grounded deep-learning modules via deep unrolling — reusable LEGO modules for Wi-Fi, mmWave, UWB and 6G sensing.">
+<meta name="author" content="Luca Jiang-Tao Yu, Chenshu Wu">
+<meta name="keywords" content="deep unrolling, wireless sensing, RF sensing, signal processing, deep learning, MobiCom 2026, mmWave, UWB, Wi-Fi CSI, beamforming, CFAR, FFT">
+<link rel="canonical" href="https://aiot-lab.github.io/RF-LEGO/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="RF-LEGO — SP–DL Co-Design for RF Sensing via Deep Unrolling">
+<meta property="og:description" content="Three deep-unrolled modules — FT, Beamformer, Detector — that stay interpretable, stay modular, and cascade. ACM MobiCom 2026.">
+<meta property="og:image" content="static/figures/og_preview.jpg">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:height" content="1080">
+<meta property="og:url" content="https://aiot-lab.github.io/RF-LEGO/">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="static/figures/favicon.svg" type="image/svg+xml">
+
+<script>
+  /* Enable JS-only enhancements and apply the stored theme before first paint. */
+  document.documentElement.classList.add('js');
+  try {
+    var t = localStorage.getItem('rflego-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+
+<link rel="preload" href="static/fonts/source-serif-4-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="static/fonts/inter-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="static/css/fonts.css">
+<link rel="stylesheet" href="static/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="static/css/style.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  "headline": "RF-LEGO: Modularized Signal Processing-Deep Learning Co-Design for RF Sensing via Deep Unrolling",
+  "author": [
+    {"@type": "Person", "name": "Luca Jiang-Tao Yu", "url": "https://1ucayu.github.io"},
+    {"@type": "Person", "name": "Chenshu Wu", "url": "https://cswu.me"}
+  ],
+  "publisher": {"@type": "Organization", "name": "ACM"},
+  "datePublished": "2026",
+  "isPartOf": "The 32nd Annual International Conference on Mobile Computing and Networking (MobiCom '26)",
+  "url": "https://arxiv.org/abs/2604.10183"
+}
+</script>
+</head>
+
+<body>
+<a class="skip" href="#abstract">Skip to content</a>
+
+<!-- ============================= TOP BAR ============================= -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__mark" href="#top">
+      <svg class="brick-glyph" viewBox="0 0 40 24" aria-hidden="true">
+        <g class="b-y"><rect x="1"  y="8" width="11" height="13" rx="2"/><rect x="3.6" y="4.5" width="5.8" height="4.5" rx="1.5"/></g>
+        <g class="b-b"><rect x="14.5" y="8" width="11" height="13" rx="2"/><rect x="17.1" y="4.5" width="5.8" height="4.5" rx="1.5"/></g>
+        <g class="b-g"><rect x="28" y="8" width="11" height="13" rx="2"/><rect x="30.6" y="4.5" width="5.8" height="4.5" rx="1.5"/></g>
+      </svg>
+      RF-LEGO
+    </a>
+    <nav aria-label="Section navigation">
+      <a href="#video">Video</a>
+      <a href="#abstract">Abstract</a>
+      <a href="#idea">Idea</a>
+      <a href="#unrolling">Unrolling</a>
+      <a href="#modules">Modules</a>
+      <a href="#cite">Cite</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle colour theme" title="Toggle colour theme">
+      <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+    <div class="progress" id="progress"></div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============================= HERO ============================= -->
+<section class="hero">
+  <div class="wrap">
+    <span class="venue"><span class="studs" aria-hidden="true"><i></i><i></i><i></i></span>ACM MobiCom 2026 &nbsp;·&nbsp; Austin, TX</span>
+    <h1 class="title">RF-LEGO</h1>
+    <div class="brickrule" aria-hidden="true"><span></span><span></span><span></span></div>
+    <p class="subtitle">Modularized Signal Processing–Deep Learning Co-Design<br>for RF Sensing via Deep Unrolling</p>
+
+    <p class="authors">
+      <a href="https://1ucayu.github.io" target="_blank" rel="noopener">Luca Jiang-Tao Yu</a>
+      <span class="sep">·</span>
+      <a href="https://cswu.me" target="_blank" rel="noopener">Chenshu Wu</a>
+    </p>
+    <p class="affil">
+      <a href="https://www.hku.hk" target="_blank" rel="noopener" aria-label="The University of Hong Kong">
+        <img class="affil__logo" src="static/figures/hku-115.svg"
+             alt="The University of Hong Kong" width="543" height="120">
+      </a>
+    </p>
+
+    <div class="links">
+      <a class="btn" href="https://arxiv.org/abs/2604.10183" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+        Paper (arXiv)
+      </a>
+      <a class="btn btn--ghost" href="https://github.com/aiot-lab/RF-LEGO" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.6 5.6.6 11.9c0 5 3.3 9.3 7.8 10.8.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6a11.4 11.4 0 0 0 7.8-10.8C23.4 5.6 18.3.5 12 .5z"/></svg>
+        Code
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="figs">
+
+<!-- ============================= TEASER VIDEO ============================= -->
+<section class="band band--tight" id="video">
+  <div class="wrap reveal">
+    <figure class="nonum">
+      <div class="plate plate--video">
+        <video controls preload="metadata" playsinline
+               poster="static/video/teaser_poster.jpg"
+               width="1920" height="1080">
+          <source src="static/video/teaser_rflego.mp4" type="video/mp4">
+          <p>Your browser cannot play this video.
+             <a href="static/video/teaser_rflego.mp4">Download the teaser (MP4)</a>.</p>
+        </video>
+      </div>
+      <figcaption class="plain">Teaser video.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================= ABSTRACT ============================= -->
+<section class="band" id="abstract">
+  <div class="wrap reveal">
+    <p class="eyebrow">Abstract</p>
+    <div class="abstract">
+      <p>Wireless sensing, traditionally relying on signal processing (SP) techniques, has recently shifted toward data-driven deep learning (DL) to achieve performance breakthroughs. However, existing deep wireless sensing models are typically end-to-end and task-specific, lacking reusability and interpretability.</p>
+      <p>We propose <strong>RF-LEGO</strong>, a modular co-design framework that transforms interpretable SP algorithms into trainable, physics-grounded DL modules through <em>deep unrolling</em>. By replacing hand-tuned parameters with learnable ones while preserving core processing structures and mathematical operators, RF-LEGO ensures <strong>modularity</strong>, <strong>cascadability</strong>, and <strong>structure-aligned interpretability</strong>. Specifically, we introduce three deep-unrolled modules for critical RF sensing tasks: frequency transform, spatial angle estimation, and signal detection.</p>
+      <p>Extensive experiments using real-world data for Wi-Fi, millimeter-wave, UWB, and 6G sensing demonstrate that RF-LEGO significantly outperforms existing SP and DL baselines, both standalone and when integrated into multiple downstream tasks. RF-LEGO pioneers a novel SP–DL co-design paradigm for wireless sensing via deep unrolling, shedding light on efficient and interpretable deep wireless sensing solutions.</p>
+    </div>
+  </div>
+
+  <div class="wrap reveal">
+    <figure class="wide">
+      <div class="plate"><img src="static/figures/rflego_core.svg" alt="Core principles of RF-LEGO: modularity, cascadability and interpretability, bridging classical signal processing and deep learning via deep unrolling." loading="lazy"></div>
+      <figcaption>Core principles of RF-LEGO — <b>Modularity</b>, <b>Cascadability</b>, and <b>Interpretability</b>. RF-LEGO bridges the gap between classical SP and DL for RF sensing via deep unrolling.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================= IDEA ============================= -->
+<section class="band" id="idea">
+  <div class="wrap reveal">
+    <h2 class="h">The dilemma, and the way out<a class="anchor-link" href="#idea">#</a></h2>
+    <p class="h-lead">Classical RF pipelines are interpretable but rigid. Deep models are adaptive but opaque — and almost never reused. RF-LEGO refuses the choice.</p>
+
+    <p>A decade of wireless sensing has been built on hand-tuned signal processing: an FFT here, a MUSIC spectrum there, a CFAR threshold at the end. Every block has a physical meaning, and every block has a constant that someone chose by hand — and has to choose again when the hardware, the room, or the SNR changes.</p>
+
+    <p>Deep wireless sensing swings the other way. CNNs, Transformers, and now LLMs learn the mapping end to end, but the result is one model for one task. When the task or environment shifts, the model is retrained rather than recomposed. Unlike vision or NLP, <em>almost no deep wireless sensing model gets reused by the next paper.</em></p>
+
+    <p><strong>Deep unrolling</strong> offers a third way. Take a classical iterative algorithm, turn each of its steps into a differentiable layer, and replace only its hand-tuned coefficients with learnable, physics-constrained parameters. The operator structure — and with it the physical meaning of every intermediate signal — survives training. RF-LEGO is the first framework to apply this <em>modularly</em> to RF sensing.</p>
+
+    <div class="cards">
+      <div class="card card--y">
+        <span class="card__stud" aria-hidden="true"></span>
+        <h4>Modularity</h4>
+        <p>Each module unrolls a classical algorithm and mirrors its input/output semantics, adding a minimal set of trainable parameters. Plug-and-play across pipelines, datasets and applications — no retraining required.</p>
+      </div>
+      <div class="card card--b">
+        <span class="card__stud" aria-hidden="true"></span>
+        <h4>Cascadability</h4>
+        <p>Modules snap together, or into existing models. FT → Detector for range and Doppler; Beamformer → Detector for angle. Benefits compound rather than cancel along the chain.</p>
+      </div>
+      <div class="card card--g">
+        <span class="card__stud" aria-hidden="true"></span>
+        <h4>Interpretability</h4>
+        <p>Every stage keeps a well-defined contract and a semantically meaningful output in a standard signal domain — so classical criteria like PSLR and PAPR still apply to a <em>learned</em> block.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>Scope of the claim.</strong> RF-LEGO does not promise that every learned weight is human-readable. What it guarantees is <em>structure-aligned</em> interpretability: intra-block operator structure and inter-block pipeline structure remain precisely aligned with the classical SP diagram they were unrolled from.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= UNROLLING PRIMER ============================= -->
+<section class="band" id="unrolling">
+  <div class="wrap reveal">
+    <h2 class="h">A primer on deep unrolling<a class="anchor-link" href="#unrolling">#</a></h2>
+    <p class="h-lead">Two design patterns cover most of what one can do to a classical block without breaking it.</p>
+
+    <p>Most deep learning models are purely data-driven, and their learned structures are hard to interpret: end-to-end networks learn task-specific mappings entirely through backpropagation over high-dimensional parameters whose individual roles are opaque. Classical signal processing is interpretable at both the pipeline and the block level, because it is derived from physical models and domain priors — but it suffers from <em>parameter rigidity</em>, since its performance hinges on expert-tuned hyperparameters that need recalibration whenever the environment changes.</p>
+
+    <p>Deep unrolling transforms signal processing techniques into structured neural architectures, combining the adaptability of deep learning with the interpretability and physics of classical methods. Broadly, it falls into two categories.</p>
+
+    <figure style="--fw:750px">
+      <div class="plate"><img src="static/figures/deep_unrolling.svg" alt="Two categories of deep unrolling: operator unrolling replaces a signal-processing block with a trainable operator; iterative-optimization unrolling opens the solver loop into trainable layers." loading="lazy"></div>
+      <figcaption><b>S</b>: signal processing block · <b>O</b>: unrolled trainable operator · <b>I</b>: unrolled trainable iterative block.</figcaption>
+    </figure>
+
+    <div class="pi pi--split">
+      <div>
+        <h5>Operator unrolling</h5>
+        <p>Keep the pipeline; swap one classical block for a drop-in trainable operator that mirrors its mathematics. Fixed kernels, filters and thresholds become a compact set of physics-constrained parameters, while complex-valued semantics and intermediate states stay exposed. The result is a plug-and-play block with strong domain alignment and easy composition with neighbouring stages.</p>
+      </div>
+      <div>
+        <h5>Iterative-optimization unrolling</h5>
+        <p>Keep the block; open its inner loop. Each solver iteration becomes a network layer with learnable step sizes, preconditioners and proximal or shrinkage maps — turning an algorithm into a structured, trainable stack that preserves structure-aligned interpretability.</p>
+      </div>
+    </div>
+
+    <p>Together these give a concise design vocabulary: either swap in a trainable operator that respects the classical interface, or unfold the operator's iterative routine into a stable, interpretable, data-driven network.</p>
+
+    <p>Deep unrolling has already reshaped sparse coding, Kalman filtering and image restoration. Its potential for the particular constraints of deep wireless sensing had not been explored: different SP operators impose distinct proximal structures and constraints; non-differentiable steps need smooth, bounded surrogates to keep backpropagation from collapsing; and true modularity demands preserving the classical input/output and complex-valued semantics so blocks stay plug-and-play and calibratable across platforms. RF-LEGO opens that direction.</p>
+  </div>
+</section>
+
+<!-- ============================= MODULES ============================= -->
+<section class="band" id="modules">
+  <div class="wrap reveal">
+    <h2 class="h">Three modules<a class="anchor-link" href="#modules">#</a></h2>
+    <p class="h-lead">Frequency transform, spatial angle estimation, and signal detection — the three operations that appear in nearly every RF sensing pipeline ever published.</p>
+  </div>
+
+  <!-- ---------- FT ---------- -->
+  <div class="wrap module module--y reveal">
+    <div class="module__head">
+      <span class="module__tag">Module 01</span>
+      <h3>RF-LEGO FT</h3>
+    </div>
+    <p class="module__sub">Frequency transform · unrolled from Bluestein's algorithm</p>
+
+    <div class="pi">
+      <div>
+        <h5>The problem</h5>
+        <p>The FFT's basis is fixed and scene-independent. Sidelobe leakage from a strong reflector can bury a weak target entirely, and the Cooley–Tukey factorization offers no localized, structure-preserving place to learn. Preprocessing filters help marginally; Hilbert–Huang-style decompositions cost more and suffer mode mixing.</p>
+      </div>
+      <div>
+        <h5>The unrolling</h5>
+        <p>Bluestein's algorithm rewrites the DFT as chirp multiply → <em>one convolution</em> → chirp multiply. That single convolution is a clean insertion point. Keep the chirps; make only the convolution learnable, initialized from the chirp sequence itself.</p>
+      </div>
+    </div>
+
+    <figure>
+      <div class="plate"><img src="static/figures/lego_ft.svg" alt="RF-LEGO FT architecture: Bluestein's algorithm implements the Fourier transform as a convolution with a chirp; RF-LEGO FT replaces the fixed convolution with a learnable complex-valued convolutional layer." loading="lazy"></div>
+      <figcaption>(a) Bluestein's algorithm implements the Fourier transform via convolution, where <b>b</b> is the chirp signal and <b>z*</b> its conjugate. (b) RF-LEGO FT replaces the fixed convolution with a learnable convolutional layer. (c) On the mmWave range axis, RF-LEGO FT suppresses sidelobes at low SNR and isolates targets submerged in clutter where the classical algorithm fails.</figcaption>
+    </figure>
+
+    <p>Using the identity <span class="katex-inline">$nk=-\tfrac{(k-n)^2}{2}+\tfrac{n^2}{2}+\tfrac{k^2}{2}$</span>, the transform factorizes as</p>
+
+    <div class="eq">
+      $$\mathcal{R}[k] \;=\; e^{-j\pi \frac{k^{2}}{N}}\cdot\big(\underbrace{s_n e^{-j\pi \frac{n^{2}}{N}}}_{\boldsymbol{a}} \circledast \underbrace{e^{\,j\pi \frac{n^{2}}{N}}}_{\boldsymbol{b}}\big)[k] \;+\; \mathfrak{F}(\boldsymbol{n})[k]$$
+    </div>
+
+    <p>which is algebraically <em>equal</em> to the DFT, retains complex-valued semantics, and isolates a single fixed-kernel convolution. Because DL toolchains implement cross-correlation rather than flipped-kernel convolution,</p>
+
+    <div class="eq">
+      $$(\boldsymbol{a}\circledast\boldsymbol{b})[k]=
+      \begin{cases}
+      \sum_{n} \boldsymbol{a}[k-n]\,\boldsymbol{b}[n], & \text{(SP)}\\[2pt]
+      \sum_{n} \boldsymbol{a}[k+n]\,\boldsymbol{b}[n], & \text{(DL)}
+      \end{cases}$$
+    </div>
+
+    <p>we exploit the equivalence between correlation with a filter and convolution with its flipped version — valid precisely because the filter is trainable. The operator is instantiated as a shallow <strong>complex-valued CNN sitting exactly at Bluestein's convolution site</strong>, with smooth activations for mild nonlinearity and SP-basis initialization for a stable start. An optional lightweight nulling head applies soft trainable shrinkage at the output, acting as a stabilizer rather than the primary source of improvement.</p>
+
+    <div class="spec">
+      <div><dt>Interface</dt><dd>ℂ<sup>N</sup> → ℂ<sup>N</sup></dd></div>
+      <div><dt>Learnable</dt><dd>complex conv kernel</dd></div>
+      <div><dt>Cost</dt><dd>0.02 GFLOPs</dd></div>
+      <div><dt>Params</dt><dd>0.8 M</dd></div>
+    </div>
+  </div>
+
+  <!-- ---------- Beamformer ---------- -->
+  <div class="wrap module module--b reveal">
+    <div class="module__head">
+      <span class="module__tag">Module 02</span>
+      <h3>RF-LEGO Beamformer</h3>
+    </div>
+    <p class="module__sub">Spatial angle estimation · unrolled LASSO with a gated ADMM solver</p>
+
+    <div class="pi">
+      <div>
+        <h5>The problem</h5>
+        <p>MUSIC needs the source count and a clean signal/noise subspace split; it is brittle under coherent multipath and low SNR. Worse for co-design, its eigenvalue decomposition has notoriously unstable gradients, which destabilizes training if unrolled naively. Plain ADMM with rigid coefficients over-shrinks true components and converges slowly.</p>
+      </div>
+      <div>
+        <h5>The unrolling</h5>
+        <p>Recast beamforming as sparse spectral estimation over an angle grid (LASSO) and unroll the ADMM solver. The steering model and the explicit angle spectrum are untouched; only step sizes, a diagonal preconditioner, the shrinkage level and a GRU-style gate become learnable. No eigendecomposition anywhere.</p>
+      </div>
+    </div>
+
+    <figure>
+      <div class="plate"><img src="static/figures/lego_bf.svg" alt="RF-LEGO Beamformer architecture: the classical LASSO-ADMM solver versus the unrolled architecture with learnable step sizes, preconditioner and gate." loading="lazy"></div>
+      <figcaption>(a) The classical LASSO solver using ADMM. (b) The unrolled architecture with learnable parameters. <b>x</b><sup>(t)</sup> is the estimated sparse angular spectrum, <b>z</b><sup>(t)</sup> the auxiliary variable, <b>v</b><sup>(t)</sup> the dual variable, and <b>g</b><sup>(t)</sup> the learned gate that balances historical and current estimates.</figcaption>
+    </figure>
+
+    <p>For a ULA of <span class="katex-inline">$M$</span> elements observing <span class="katex-inline">$K$</span> far-field sources, we solve on a discretized angle grid</p>
+
+    <div class="eq">
+      $$\hat{\boldsymbol{x}}=\arg\min_{\boldsymbol{x}}\;\tfrac{1}{2}\lVert \boldsymbol{r}-\boldsymbol{A}\boldsymbol{x}\rVert_2^2+\tau\lVert\boldsymbol{x}\rVert_1 ,$$
+    </div>
+
+    <p>and unroll each ADMM iteration into a trainable layer:</p>
+
+    <div class="eq">
+      $$\begin{aligned}
+      \boldsymbol{x}^{(t+1)} &= \big(\boldsymbol{W}^{(t)}+\eta^{(t)}\boldsymbol{I}\big)^{-1}\big(\boldsymbol{A}^{\mathsf{H}}\boldsymbol{r}+\eta^{(t)}(\boldsymbol{z}^{(t)}-\boldsymbol{v}^{(t)})\big),\\
+      \boldsymbol{g}^{(t)} &= \sigma\big(\boldsymbol{W}_g\boldsymbol{z}^{(t)}+\boldsymbol{U}_g\boldsymbol{v}^{(t)}\big),\\
+      \boldsymbol{z}^{(t+1)} &= \boldsymbol{g}^{(t)}\odot(\boldsymbol{x}^{(t+1)}+\boldsymbol{v}^{(t)})+(1-\boldsymbol{g}^{(t)})\odot\boldsymbol{z}^{(t)},\\
+      \boldsymbol{v}^{(t+1)} &= \boldsymbol{v}^{(t)}+\boldsymbol{x}^{(t+1)}-\boldsymbol{z}^{(t+1)},
+      \end{aligned}$$
+    </div>
+
+    <p>with <span class="katex-inline">$\boldsymbol{W}^{(t)}=\mathrm{diag}(\boldsymbol{w}^{(t)})$</span> a learnable diagonal preconditioner that keeps the linear solve cheap, and <span class="katex-inline">$\eta^{(t)}=\mathrm{softplus}(\tilde{\eta}^{(t)})>0$</span> enforcing stable steps. The gate acts as learned relaxation — momentum with a schedule the network discovers for itself.</p>
+
+    <div class="spec">
+      <div><dt>Interface</dt><dd>ℂ<sup>M</sup> → ℝ<sup>N</sup> spectrum</dd></div>
+      <div><dt>Learnable</dt><dd>η, W, gate, τ</dd></div>
+      <div><dt>Cost</dt><dd>0.83 GFLOPs</dd></div>
+      <div><dt>Params</dt><dd>0.6 M</dd></div>
+    </div>
+  </div>
+
+  <!-- ---------- Detector ---------- -->
+  <div class="wrap module module--g reveal">
+    <div class="module__head">
+      <span class="module__tag">Module 03</span>
+      <h3>RF-LEGO Detector</h3>
+    </div>
+    <p class="module__sub">Signal detection · CFAR recast as a differentiable state space model</p>
+
+    <div class="pi">
+      <div>
+        <h5>The problem</h5>
+        <p>CFAR's core operations are not differentiable — order statistics, in particular, block backpropagation outright — so CFAR cannot simply be unrolled. Prior neural CFARs face a dilemma: over-simplify the noise model to stay differentiable, or drop in a black box that destroys the interpretability unrolling exists to preserve.</p>
+      </div>
+      <div>
+        <h5>The unrolling</h5>
+        <p>CFAR is adaptive thresholding driven by a temporally estimated noise level — which is exactly what a state space model does. We recast selection-and-testing as a discrete SSM: the latent state replaces the selection operator, the feedthrough term plays the testing operator, and the CFAR decision diagram is left intact.</p>
+      </div>
+    </div>
+
+    <figure>
+      <div class="plate"><img src="static/figures/lego_detector.svg" alt="RF-LEGO Detector architecture: classical CFAR with a fixed sliding window versus RF-LEGO's state space model formulation." loading="lazy"></div>
+      <figcaption>(a) Classical CFAR uses a fixed sliding window. (b) RF-LEGO unrolls the logic into a state space model, where <b>r</b> is the input signal vector, <b>z</b> the learned state vector, and <b>ŝ</b> the detection vector derived from the state.</figcaption>
+    </figure>
+
+    <p>Classical CFAR reads <span class="katex-inline">$\boldsymbol{s}_n=\boldsymbol{C}\,\boldsymbol{g}_1(\boldsymbol{r}_n)+\boldsymbol{g}_2(\boldsymbol{r}_n)$</span>, with <span class="katex-inline">$\boldsymbol{g}_1$</span> a (possibly non-linear) selection operator and <span class="katex-inline">$\boldsymbol{g}_2$</span> the test. The unrolled model keeps that shape but learns the dynamics:</p>
+
+    <div class="eq">
+      $$\boldsymbol{z}_n=\boldsymbol{A}\boldsymbol{z}_{n-1}+\boldsymbol{B}\boldsymbol{x}_n,\qquad
+      \boldsymbol{s}_n=\boldsymbol{C}\boldsymbol{z}_n+\boldsymbol{D}\boldsymbol{x}_n$$
+    </div>
+
+    <p>which is the trapezoidal discretization of a continuous-time system, so the block stays faithful to the underlying dynamics while <span class="katex-inline">$\boldsymbol{A},\boldsymbol{B},\boldsymbol{C},\boldsymbol{D}$</span> adapt to data:</p>
+
+    <div class="eq">
+      $$\boldsymbol{z}_n=\Big(\boldsymbol{I}-\tfrac{\Delta t}{2}\boldsymbol{A}\Big)^{-1}\Big[\Big(\boldsymbol{I}+\tfrac{\Delta t}{2}\boldsymbol{A}\Big)\boldsymbol{z}_{n-1}+\Delta t\,\boldsymbol{B}\boldsymbol{x}_n\Big]$$
+    </div>
+
+    <p>The result circumvents CFAR's tedious guard/training-cell tuning, adds structured memory that tracks clutter and drift, and — crucially for deployment — <strong>retains explicit control of the operating point</strong>, the detection/false-alarm trade-off that practical systems are specified against.</p>
+
+    <div class="spec">
+      <div><dt>Interface</dt><dd>ℝ<sup>N</sup> → ℝ<sup>N</sup> mask</dd></div>
+      <div><dt>Learnable</dt><dd>A, B, C, D</dd></div>
+      <div><dt>Cost</dt><dd>0.05 GFLOPs</dd></div>
+      <div><dt>Params</dt><dd>0.4 M</dd></div>
+    </div>
+  </div>
+
+  <div class="wrap reveal">
+    <h3 class="sh">Snapping them together</h3>
+    <p>The three modules can be used separately or combined, like LEGO blocks: RF-LEGO FT followed by RF-LEGO Detector for breathing-rate estimation, or the Beamformer followed by the Detector for angle. Because each unrolled module preserves the interface of the classical technique it came from, they also drop straight into prior and emerging sensing pipelines. The paper evaluates all of this on real Wi-Fi, mmWave, UWB and 6G data, standalone and inside trajectory tracking, vital-sign monitoring and activity recognition — see the <a href="https://arxiv.org/abs/2604.10183" target="_blank" rel="noopener">paper</a> for the full results.</p>
+
+    <div class="note">
+      <p><strong>Trained on synthetic data only.</strong> Every module is trained on ~30k synthetic frames — noisy spectra with injected leakage for FT, random-source array snapshots for the Beamformer, superimposed Hann/Hamming peaks at 5–40 dB SNR for the Detector — and then evaluated zero-shot on real measurements. PyTorch, one RTX 4090, AdamW at 1×10⁻³, batch 512, dropout 0.2; cosine-similarity loss for FT and Beamformer, BCE for the Detector.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= DISCUSSION ============================= -->
+<section class="band" id="discussion">
+  <div class="wrap reveal">
+    <h2 class="h">Limitation: information alienation<a class="anchor-link" href="#discussion">#</a></h2>
+    <p>One honest caveat. The unrolled modules perform well downstream, but their learned internal representations may drift away from the clean, canonical outputs that classical algorithms produce with crisp physical definitions. Our interpretability claim is therefore <strong>structure-aligned</strong>, not total: we preserve well-defined input/output contracts and semantically meaningful intermediate outputs, but we do not guarantee full fidelity of every internal learned state inside a block.</p>
+    <p>Balancing physical fidelity against task optimization — getting fully interpretable <em>and</em> high-performance sensing — is the direction we think matters most next.</p>
+    <div class="note">
+      <p><strong>An open invitation.</strong> Three modules are a starting set, not a closed library. The unrolling patterns generalize; we hope the community contributes RF-LEGO blocks for the many other techniques RF sensing depends on.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= CITE ============================= -->
+<section class="band" id="cite">
+  <div class="wrap reveal">
+    <h2 class="h">Citation<a class="anchor-link" href="#cite">#</a></h2>
+    <div class="cite-box">
+      <button class="copy-btn" id="copyBib" type="button">Copy</button>
+<pre class="bib" id="bibtex">@INPROCEEDINGS{luca2026mobicom_rflego,
+  author={Luca Jiang-Tao Yu and Chenshu Wu},
+  booktitle={ACM International Conference on Mobile Computing and Networking},
+  title={RF-LEGO: Modularized Signal Processing-Deep Learning Co-Design for RF Sensing via Deep Unrolling},
+  pages={},
+  month={Oct},
+  year={2026},
+}</pre>
+    </div>
+  </div>
+</section>
+
+</div><!-- /.figs -->
+
+<footer class="site">
+  <div class="wrap-wide">
+    <div class="brickrule brickrule--foot" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="foot-grid">
+      <div class="foot-note">
+        <p style="margin-bottom:.5rem"><strong style="font-family:var(--serif);font-size:1rem">RF-LEGO</strong> · ACM MobiCom 2026, Austin, TX, USA</p>
+        <p style="margin-bottom:.5rem">Luca Jiang-Tao Yu and Chenshu Wu · <a href="https://www.hku.hk" target="_blank" rel="noopener">The University of Hong Kong</a></p>
+        <p style="margin:0;font-size:.78rem">Supported by NSFC No. 62222216, Hong Kong RGC ECS No. 27204522, GRF No. 17212224 and No. 17211725, and CRF No. C5002-23Y.</p>
+      </div>
+      <div>
+        <p style="margin:0 0 .35rem"><a href="https://arxiv.org/abs/2604.10183" target="_blank" rel="noopener">Paper (arXiv)</a></p>
+        <p style="margin:0 0 .35rem"><a href="https://github.com/aiot-lab/RF-LEGO" target="_blank" rel="noopener">Code on GitHub</a></p>
+        <p style="margin:0"><a href="https://aiot.cs.hku.hk" target="_blank" rel="noopener">AIoT Lab @ HKU</a></p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<script defer src="static/vendor/katex/katex.min.js"></script>
+<script defer src="static/vendor/katex/auto-render.min.js"></script>
+<script defer src="static/js/main.js"></script>
+</body>
+</html>

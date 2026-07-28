@@ -1,0 +1,591 @@
+/* ==========================================================================
+   RF-LEGO — project page
+   Paper-like academic layout. Palette taken from the three bricks in Fig. 1:
+   yellow #FFC001, blue #0070C0, green #00B050 — one colour per brick.
+   The brick colours are used as fills, borders and tints only; body text and
+   labels stay on the ink ramp, and the blue doubles as the link accent
+   because it is the only one of the three that clears AA on paper.
+   ========================================================================== */
+
+:root {
+  /* the three bricks */
+  --lego-y:    #FFC001;
+  --lego-b:    #0070C0;
+  --lego-g:    #00B050;
+  --lego-y-on: #16130A;   /* text placed on the yellow */
+  --lego-b-on: #FFFFFF;
+  --lego-g-on: #0B1710;
+  --lego-y-soft: #FFF5DB;
+  --lego-b-soft: #E7F1FA;
+  --lego-g-soft: #E1F6EB;
+
+  --paper:     #FCFCFB;
+  --surface:   #FFFFFF;
+  --surface-2: #F4F5F3;
+  --ink:       #14171C;
+  --ink-2:     #3D434B;
+  --ink-3:     #6B727A;
+  --rule:      #E3E4E1;
+  --rule-soft: #EFF0ED;
+
+  --accent:      var(--lego-b);
+  --accent-soft: var(--lego-b-soft);
+
+  --serif: "Source Serif 4", "Source Serif Pro", Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --w-text: 46rem;
+  --w-wide: 68rem;
+  --shadow-sm: 0 1px 2px rgba(20, 22, 26, .04), 0 2px 10px rgba(20, 22, 26, .04);
+  --shadow-md: 0 2px 4px rgba(20, 22, 26, .05), 0 10px 32px rgba(20, 22, 26, .07);
+}
+
+/* dark theme — the bricks are lifted just enough to stay legible on ink */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --lego-y:    #FFC93A;
+    --lego-b:    #4FA9E8;
+    --lego-g:    #2FCB7B;
+    --lego-y-on: #16130A;
+    --lego-b-on: #0A1420;
+    --lego-g-on: #06150D;
+    --lego-y-soft: #2C2411;
+    --lego-b-soft: #11242F;
+    --lego-g-soft: #0E2419;
+
+    --paper:     #101317;
+    --surface:   #171B20;
+    --surface-2: #1D2229;
+    --ink:       #ECEEF0;
+    --ink-2:     #C1C7CD;
+    --ink-3:     #8A9199;
+    --rule:      #2A3038;
+    --rule-soft: #20252C;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.3), 0 2px 10px rgba(0,0,0,.25);
+    --shadow-md: 0 2px 4px rgba(0,0,0,.3), 0 10px 32px rgba(0,0,0,.35);
+  }
+}
+
+:root[data-theme="dark"] {
+  --lego-y:    #FFC93A;
+  --lego-b:    #4FA9E8;
+  --lego-g:    #2FCB7B;
+  --lego-y-on: #16130A;
+  --lego-b-on: #0A1420;
+  --lego-g-on: #06150D;
+  --lego-y-soft: #2C2411;
+  --lego-b-soft: #11242F;
+  --lego-g-soft: #0E2419;
+
+  --paper:     #101317;
+  --surface:   #171B20;
+  --surface-2: #1D2229;
+  --ink:       #ECEEF0;
+  --ink-2:     #C1C7CD;
+  --ink-3:     #8A9199;
+  --rule:      #2A3038;
+  --rule-soft: #20252C;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.3), 0 2px 10px rgba(0,0,0,.25);
+  --shadow-md: 0 2px 4px rgba(0,0,0,.3), 0 10px 32px rgba(0,0,0,.35);
+}
+
+/* ---------- base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  overflow-x: clip; /* safety net for full-bleed figures under classic scrollbars */
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.72;
+  font-feature-settings: "kern" 1, "liga" 1, "onum" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+@media (max-width: 560px) {
+  body { font-size: 16px; line-height: 1.66; }
+}
+
+p { margin: 0 0 1.15em; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: .18em; }
+strong { font-weight: 600; color: var(--ink); }
+em { font-style: italic; }
+img, svg, video { max-width: 100%; height: auto; }
+code, kbd { font-family: var(--mono); font-size: .86em; }
+
+::selection { background: var(--lego-y); color: var(--lego-y-on); }
+
+:where(a, button, video, summary):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ---------- layout ---------- */
+
+.wrap  { width: min(100% - 2.5rem, var(--w-text)); margin-inline: auto; }
+.wrap-wide { width: min(100% - 2.5rem, var(--w-wide)); margin-inline: auto; }
+
+main { counter-reset: section; }
+
+section.band { padding: 3.75rem 0 1rem; }
+section.band + section.band { padding-top: 2.25rem; }
+section.band--tight { padding-top: 1.5rem; padding-bottom: 0; }
+
+/* ---------- top bar ---------- */
+
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--rule-soft);
+}
+.topbar__inner {
+  width: min(100% - 2rem, var(--w-wide));
+  margin-inline: auto;
+  display: flex; align-items: center; gap: 1rem;
+  height: 3.4rem;
+}
+.topbar__mark {
+  display: inline-flex; align-items: center; gap: .55rem;
+  font-family: var(--sans); font-weight: 600; font-size: .86rem;
+  letter-spacing: .01em; color: var(--ink); text-decoration: none;
+  flex: none;
+}
+.topbar__mark:hover { text-decoration: none; opacity: .78; }
+.topbar nav {
+  margin-left: auto; display: flex; gap: .15rem; align-items: center;
+  overflow-x: auto; scrollbar-width: none;
+}
+.topbar nav::-webkit-scrollbar { display: none; }
+.topbar nav a {
+  font-family: var(--sans); font-size: .78rem; font-weight: 500;
+  letter-spacing: .01em;
+  color: var(--ink-3); padding: .35rem .55rem; border-radius: 5px;
+  white-space: nowrap; transition: color .15s, background .15s;
+}
+.topbar nav a:hover { color: var(--ink); background: var(--rule-soft); text-decoration: none; }
+.topbar nav a.is-active { color: var(--accent); background: var(--accent-soft); }
+.progress {
+  position: absolute; left: 0; bottom: -1px; height: 2.5px; width: 0;
+  background: linear-gradient(90deg, var(--lego-y) 0%, var(--lego-y) 33%,
+                                     var(--lego-b) 33%, var(--lego-b) 66%,
+                                     var(--lego-g) 66%, var(--lego-g) 100%);
+}
+.theme-toggle {
+  flex: none; margin-left: .35rem;
+  width: 2rem; height: 2rem; display: grid; place-items: center;
+  border: 1px solid var(--rule); border-radius: 6px;
+  background: transparent; color: var(--ink-3); cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.theme-toggle svg { width: 15px; height: 15px; }
+.theme-toggle .i-sun  { display: block; }
+.theme-toggle .i-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .i-sun  { display: none; }
+  :root:not([data-theme="light"]) .theme-toggle .i-moon { display: block; }
+}
+:root[data-theme="dark"]  .theme-toggle .i-sun  { display: none; }
+:root[data-theme="dark"]  .theme-toggle .i-moon { display: block; }
+:root[data-theme="light"] .theme-toggle .i-sun  { display: block; }
+:root[data-theme="light"] .theme-toggle .i-moon { display: none; }
+
+/* three-brick mark */
+.brick-glyph { width: 30px; height: 18px; flex: none; }
+.brick-glyph .b-y rect { fill: var(--lego-y); }
+.brick-glyph .b-b rect { fill: var(--lego-b); }
+.brick-glyph .b-g rect { fill: var(--lego-g); }
+
+/* three-colour rule */
+.brickrule { display: flex; gap: 3px; justify-content: center; margin: 0 auto 1.5rem; width: 108px; }
+.brickrule span { height: 5px; flex: 1; border-radius: 2px; }
+.brickrule span:nth-child(1) { background: var(--lego-y); }
+.brickrule span:nth-child(2) { background: var(--lego-b); }
+.brickrule span:nth-child(3) { background: var(--lego-g); }
+.brickrule--foot { justify-content: flex-start; margin: 0 0 1.5rem; width: 84px; }
+
+/* ---------- hero ---------- */
+
+.hero { padding: 3.6rem 0 1rem; text-align: center; position: relative; overflow: hidden; }
+.hero::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 320px;
+  background: radial-gradient(58rem 19rem at 50% -7rem,
+              color-mix(in srgb, var(--lego-b) 8%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.hero > * { position: relative; }
+
+.venue {
+  display: inline-flex; align-items: center; gap: .55rem;
+  font-family: var(--sans); font-size: .72rem; font-weight: 600;
+  letter-spacing: .09em; text-transform: uppercase;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  padding: .32rem .8rem .32rem .6rem; border-radius: 100px;
+  margin-bottom: 1.7rem;
+  box-shadow: var(--shadow-sm);
+}
+.venue .studs { display: inline-flex; gap: 3px; }
+.venue .studs i { width: 6px; height: 6px; border-radius: 1.5px; display: block; }
+.venue .studs i:nth-child(1) { background: var(--lego-y); }
+.venue .studs i:nth-child(2) { background: var(--lego-b); }
+.venue .studs i:nth-child(3) { background: var(--lego-g); }
+
+h1.title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2.1rem, 5.4vw, 3.2rem);
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  margin: 0 0 1.1rem;
+  color: var(--ink);
+}
+.subtitle {
+  font-family: var(--serif);
+  font-size: clamp(1.02rem, 2.2vw, 1.26rem);
+  line-height: 1.45;
+  color: var(--ink-2);
+  font-style: italic;
+  margin: 0 auto 2rem;
+  max-width: 40rem;
+  text-wrap: balance;
+}
+
+.authors {
+  font-family: var(--sans); font-size: .97rem; font-weight: 500;
+  margin-bottom: .4rem;
+}
+.authors a { color: var(--ink); border-bottom: 2px solid var(--lego-y); }
+.authors a:hover { text-decoration: none; border-color: var(--lego-b); }
+.authors .sep { color: var(--ink-3); margin: 0 .35rem; font-weight: 400; }
+.affil {
+  font-family: var(--sans); font-size: .84rem; color: var(--ink-3);
+  margin: .9rem 0 1.9rem; letter-spacing: .005em;
+}
+/* The HKU lockup carries near-black wordmarks, so on ink it sits on its own
+   white plate rather than being filtered — the crest colours stay true. */
+.affil a {
+  display: inline-block; line-height: 0; border-radius: 8px;
+  transition: opacity .15s;
+}
+.affil a:hover { opacity: .82; text-decoration: none; }
+/* a definite width, not a percentage — the link is shrink-to-fit, so a
+   percentage would resolve against the SVG's 543px intrinsic width instead */
+.affil__logo { display: block; width: 22.5rem; max-width: 100%; height: auto; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .affil a { background: #fff; padding: .6rem .95rem; }
+}
+:root[data-theme="dark"] .affil a { background: #fff; padding: .6rem .95rem; }
+:root[data-theme="light"] .affil a { background: transparent; padding: 0; }
+
+.links { display: flex; flex-wrap: wrap; gap: .55rem; justify-content: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-family: var(--sans); font-size: .84rem; font-weight: 550;
+  padding: .52rem 1rem; border-radius: 100px;
+  border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+  transition: transform .12s ease, box-shadow .15s ease, background .15s, color .15s, border-color .15s;
+}
+.btn:hover { text-decoration: none; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn svg { width: 15px; height: 15px; }
+.btn--ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn--ghost:hover { border-color: var(--ink-3); }
+
+/* ---------- headings ---------- */
+
+h2.h {
+  counter-increment: section;
+  font-family: var(--serif); font-weight: 600;
+  font-size: clamp(1.45rem, 3vw, 1.85rem); line-height: 1.22;
+  letter-spacing: -.014em;
+  margin: 0 0 .35rem; padding-top: .5rem;
+  display: flex; align-items: baseline; gap: .7rem;
+}
+h2.h::before {
+  content: counter(section);
+  font-family: var(--sans); font-size: .72rem; font-weight: 600;
+  letter-spacing: .06em; color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  border-radius: 4px; padding: .1rem .38rem; flex: none;
+  transform: translateY(-.24em);
+}
+.h-lead {
+  font-size: 1.03rem; color: var(--ink-2); margin: 0 0 2rem;
+  max-width: 42rem;
+}
+h3.sh {
+  font-family: var(--serif); font-weight: 600; font-size: 1.14rem;
+  letter-spacing: -.008em; margin: 2.4rem 0 .6rem; color: var(--ink);
+}
+.eyebrow {
+  font-family: var(--sans); font-size: .71rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+  margin-bottom: .6rem;
+}
+
+/* ---------- abstract ---------- */
+
+.abstract {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1.6rem 1.75rem .5rem;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.abstract::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, var(--lego-y) 0%, var(--lego-y) 33%,
+                                      var(--lego-b) 33%, var(--lego-b) 66%,
+                                      var(--lego-g) 66%, var(--lego-g) 100%);
+}
+.abstract p { font-size: 1.005rem; color: var(--ink-2); }
+.abstract p:first-of-type::first-letter {
+  font-size: 2.9rem; line-height: .84; float: left;
+  padding: .1rem .12em 0 0; font-weight: 700; color: var(--ink);
+}
+
+/* ---------- cards ---------- */
+
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.6rem 0 1rem; }
+@media (max-width: 780px) { .cards { grid-template-columns: 1fr; } }
+.card {
+  --tone: var(--accent);
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 4px;
+  border-top: 3px solid var(--tone);
+  padding: 1.1rem 1.2rem 1.2rem; box-shadow: var(--shadow-sm);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.card--y { --tone: var(--lego-y); }
+.card--b { --tone: var(--lego-b); }
+.card--g { --tone: var(--lego-g); }
+.card__stud {
+  display: block; width: 22px; height: 10px; border-radius: 3px;
+  background: var(--tone); margin-bottom: .8rem;
+}
+.card h4 {
+  font-family: var(--serif); font-size: 1.06rem; font-weight: 600;
+  margin: 0 0 .4rem; letter-spacing: -.008em;
+}
+.card p { font-size: .93rem; color: var(--ink-2); margin: 0; line-height: 1.6; }
+
+/* ---------- figures ---------- */
+
+.figs { counter-reset: figure; }
+figure {
+  margin: 2rem 0 2.2rem;
+  counter-increment: figure;
+  max-width: var(--fw, none);
+}
+figure.nonum { counter-increment: none; }
+figure.wide {
+  width: min(100vw - 2.5rem, var(--fw, var(--w-wide)));
+  max-width: none;
+  margin-inline: calc(50% - min(50vw - 1.25rem, var(--fw, var(--w-wide)) / 2));
+}
+.plate {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 1.1rem;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.plate img { display: block; margin-inline: auto; width: 100%; }
+.plate--video {
+  background: #0B0D10; padding: 0; border-color: var(--rule);
+  line-height: 0;
+}
+.plate--video video { display: block; width: 100%; height: auto; background: #0B0D10; }
+figcaption {
+  font-family: var(--sans); font-size: .8rem; line-height: 1.6;
+  color: var(--ink-3);
+  margin: .7rem auto 0; max-width: min(100%, 46rem);
+  text-align: center; text-wrap: pretty;
+}
+figcaption::before {
+  content: "Figure " counter(figure) ". ";
+  font-weight: 600; color: var(--ink-2);
+}
+figcaption.plain::before { content: none; }
+figcaption b, figcaption strong { color: var(--ink-2); font-weight: 600; }
+
+/* ---------- module block ---------- */
+
+.module {
+  --tone: var(--accent);
+  --tone-on: var(--lego-b-on);
+  --tone-soft: var(--accent-soft);
+  border-top: 1px solid var(--rule);
+  padding-top: 2.1rem; margin-top: 2.6rem;
+}
+.module--y { --tone: var(--lego-y); --tone-on: var(--lego-y-on); --tone-soft: var(--lego-y-soft); }
+.module--b { --tone: var(--lego-b); --tone-on: var(--lego-b-on); --tone-soft: var(--lego-b-soft); }
+.module--g { --tone: var(--lego-g); --tone-on: var(--lego-g-on); --tone-soft: var(--lego-g-soft); }
+.module:first-of-type { border-top: 0; margin-top: 1rem; padding-top: 0; }
+.module__head { display: flex; align-items: center; gap: .75rem; margin-bottom: .2rem; flex-wrap: wrap; }
+.module__tag {
+  font-family: var(--sans); font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--tone-on); background: var(--tone);
+  padding: .24rem .55rem; border-radius: 3px; flex: none;
+}
+.module h3 {
+  font-family: var(--serif); font-size: 1.42rem; font-weight: 600;
+  letter-spacing: -.012em; margin: 0;
+}
+.module__sub { font-family: var(--sans); font-size: .87rem; color: var(--ink-3); margin: .25rem 0 1.3rem; }
+
+.spec {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--rule); border-top: 2px solid var(--tone);
+  border-radius: 4px;
+  background: var(--surface-2);
+  margin: 1.4rem 0 1.6rem;
+  overflow: hidden;
+}
+.spec > div { padding: .8rem .9rem; }
+.spec > div + div { border-left: 1px solid var(--rule); }
+.spec dt {
+  font-family: var(--sans); font-size: .66rem; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: .28rem;
+}
+.spec dd {
+  margin: 0; font-family: var(--mono); font-size: .82rem; color: var(--ink);
+  line-height: 1.45; word-break: break-word;
+}
+@media (max-width: 780px) {
+  .spec { grid-template-columns: repeat(2, 1fr); }
+  .spec > div:nth-child(3) { border-left: none; }
+  .spec > div:nth-child(n+3) { border-top: 1px solid var(--rule); }
+}
+
+/* problem → idea panels — --tone / --tone-soft are inherited from .module */
+.pi {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  margin: 1.4rem 0; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden;
+}
+@media (max-width: 780px) { .pi { grid-template-columns: 1fr; } }
+.pi > div { padding: 1.05rem 1.15rem; }
+.pi > div + div { border-left: 1px solid var(--rule); background: var(--tone-soft, var(--accent-soft)); }
+@media (max-width: 780px) { .pi > div + div { border-left: 0; border-top: 1px solid var(--rule); } }
+.pi h5 {
+  font-family: var(--sans); font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; margin: 0 0 .5rem; color: var(--ink-3);
+  display: flex; align-items: center; gap: .45rem;
+}
+.pi > div + div h5::before {
+  content: ""; width: 9px; height: 9px; border-radius: 2px;
+  background: var(--tone, var(--accent)); flex: none;
+}
+.pi p { margin: 0; font-size: .95rem; color: var(--ink-2); line-height: 1.62; }
+/* the two unrolling patterns: one blue panel, one green panel */
+.pi--split > div:first-child { background: var(--lego-b-soft); }
+.pi--split > div + div { background: var(--lego-g-soft); }
+.pi--split > div:first-child h5::before,
+.pi--split > div + div h5::before {
+  content: ""; width: 9px; height: 9px; border-radius: 2px; flex: none;
+}
+.pi--split > div:first-child h5::before { background: var(--lego-b); }
+.pi--split > div + div h5::before { background: var(--lego-g); }
+
+/* ---------- math ---------- */
+
+.eq {
+  margin: 1.4rem 0; padding: .9rem 1rem;
+  background: var(--surface); border: 1px solid var(--rule-soft);
+  border-radius: 4px; overflow-x: auto; overflow-y: hidden;
+}
+.eq .katex-display { margin: .2rem 0; }
+.katex { font-size: 1.02em; }
+
+/* ---------- callout ---------- */
+
+.note {
+  border-left: 3px solid var(--lego-y);
+  background: var(--lego-y-soft);
+  padding: .9rem 1.1rem; border-radius: 0 4px 4px 0;
+  margin: 1.6rem 0; font-size: .95rem; color: var(--ink-2);
+}
+.note strong { color: var(--ink); }
+.note p:last-child { margin-bottom: 0; }
+
+/* ---------- bibtex ---------- */
+
+.cite-box { position: relative; margin: 1.4rem 0 0; }
+pre.bib {
+  background: var(--surface); color: var(--ink-2);
+  border: 1px solid var(--rule); border-radius: 4px;
+  padding: 1.1rem 1.2rem; overflow-x: auto;
+  font-family: var(--mono); font-size: .8rem; line-height: 1.65;
+  margin: 0;
+}
+.copy-btn {
+  position: absolute; top: .6rem; right: .6rem;
+  font-family: var(--sans); font-size: .72rem; font-weight: 500;
+  padding: .3rem .6rem; border-radius: 4px;
+  border: 1px solid var(--rule); background: var(--paper); color: var(--ink-3);
+  cursor: pointer; transition: color .15s, border-color .15s;
+}
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+.copy-btn.done { color: var(--lego-g); border-color: var(--lego-g); }
+
+/* ---------- footer ---------- */
+
+footer.site {
+  margin-top: 4.5rem; border-top: 1px solid var(--rule);
+  padding: 2.2rem 0 3rem;
+  font-family: var(--sans); font-size: .82rem; color: var(--ink-3);
+}
+footer.site a { color: var(--ink-2); }
+footer.site a:hover { color: var(--accent); }
+.foot-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: flex-start; }
+.foot-note { max-width: 34rem; line-height: 1.6; }
+
+/* ---------- misc ---------- */
+
+.anchor-link {
+  font-family: var(--sans); font-size: .8rem; color: var(--ink-3);
+  opacity: 0; transition: opacity .15s; margin-left: .4rem;
+}
+h2.h:hover .anchor-link { opacity: 1; }
+
+/* Fade-in is opt-in via the .js class, so the page is never blank without JS. */
+html.js .reveal { opacity: 0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease; }
+html.js .reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal { opacity: 1; transform: none; }
+}
+
+.skip {
+  position: absolute; left: -9999px; top: 0;
+  background: var(--ink); color: var(--paper); padding: .6rem 1rem; z-index: 100;
+  font-family: var(--sans); font-size: .85rem; border-radius: 0 0 4px 0;
+}
+.skip:focus { left: 0; }
+
+@media print {
+  .topbar, .theme-toggle, .copy-btn { position: static; }
+  html.js .reveal { opacity: 1 !important; transform: none !important; }
+  body { background: #fff; }
+}

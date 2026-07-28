@@ -1,178 +1,112 @@
-<div align="center">
+# RF-LEGO — project website
 
-# RF-LEGO: Modularized Signal Processing-Deep Learning Co-Design for RF Sensing via Deep Unrolling
+Source for the [RF-LEGO](https://github.com/aiot-lab/RF-LEGO) project page.
 
+> **RF-LEGO: Modularized Signal Processing–Deep Learning Co-Design for RF Sensing via Deep Unrolling**
+> Luca Jiang-Tao Yu, Chenshu Wu — The University of Hong Kong
+> ACM MobiCom 2026, Austin, TX, USA
 
-[![Static Badge](https://img.shields.io/badge/arXiv-PDF-green?style=flat&logo=arXiv&logoColor=B31B1B)](https://arxiv.org/abs/2604.10183) [![License: LGPL v2.1](https://img.shields.io/badge/License-LGPL_v2.1-blue.svg)](https://www.gnu.org/licenses/lgpl-2.1) [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-</div>
+This branch (`website`) contains **only** the static site — no Python package, no
+training code. The implementation lives on [`main`](https://github.com/aiot-lab/RF-LEGO/tree/main).
 
-<div align="center">
-    <a href=https://1ucayu.github.io>
-        Luca Jiang-Tao Yu
-    </a>
-    ,
-    <a href=https://cswu.me>
-        Chenshu Wu
-    </a>
-</div>
+The page covers the teaser video, the abstract and the method (deep unrolling and
+the three bricks). Experimental results are left to the paper.
 
-<div align="center">
+## Layout
 
-The University of Hong Kong
-</div>
+```
+.
+├── index.html               # the whole page (single-page, long scroll)
+├── .nojekyll                # serve files verbatim, skip Jekyll
+└── static/
+    ├── css/
+    │   ├── style.css        # design system
+    │   └── fonts.css        # @font-face for the self-hosted webfonts
+    ├── js/main.js           # theme toggle, scroll progress, KaTeX, copy-BibTeX
+    ├── fonts/               # Source Serif 4 / Inter / JetBrains Mono (latin woff2)
+    ├── vendor/katex/        # KaTeX 0.16.11, self-hosted
+    ├── video/
+    │   ├── teaser_rflego.mp4    # 1080p30 H.264 High / AAC-LC, faststart, 5.5 MB
+    │   └── teaser_poster.jpg    # poster frame
+    └── figures/             # the five method figures from the paper
+        ├── rflego_core.svg      # Fig. 1 — the three principles
+        ├── deep_unrolling.svg   # the two unrolling patterns
+        ├── lego_ft.svg
+        ├── lego_bf.svg
+        ├── lego_detector.svg
+        ├── favicon.svg
+        └── og_preview.jpg       # social card
+```
 
-The official implementation of RF-LEGO: Modularized Signal Processing-Deep Learning Co-Design for RF Sensing via Deep Unrolling, accepted by ACM Mobicom 2026, Austin, TX, USA.
-
----
-
-## Abstract
-Wireless sensing, traditionally relying on signal processing (SP) techniques, has recently shifted toward data-driven deep learning (DL) to achieve performance breakthroughs. However, existing deep wireless sensing models are typically end-to-end and task-specific, lacking reusability and interpretability. We propose RF-LEGO, a modular co-design framework that transforms interpretable SP algorithms into trainable, physics-grounded DL modules through deep unrolling. By replacing hand-tuned parameters with learnable ones while preserving core processing structures and mathematical operators, RF-LEGO ensures modularity, cascadability, and structure-aligned interpretability. Specifically, we introduce three deep-unrolled modules for critical RF sensing tasks: frequency transform, spatial angle estimation, and signal detection. Extensive experiments using real-world data for Wi-Fi, millimeter-wave, UWB, and 6G sensing demonstrate that RF-LEGO significantly outperforms existing SP and DL baselines, both standalone and when integrated into downstream tasks such as tracking and vital sign monitoring. RF-LEGO pioneers a novel SP-DL co-design paradigm for wireless sensing via deep unrolling, shedding light on efficient and interpretable deep wireless sensing solutions.
-
-<p align="center"> 
-  <img src='src/figures/thumbnail.png' align="center">
-</p>
-
----
-
-## Installation
+No build step, no dependencies to install, **no third-party requests at runtime** —
+KaTeX and the webfonts are vendored, so the page renders identically offline, in
+restricted networks, and behind privacy blockers. Open `index.html` directly, or
+serve the folder:
 
 ```bash
-$ git clone https://github.com/1ucayu/RF-LEGO.git
-$ cd RF-LEGO
-$ uv sync
+python3 -m http.server 8000     # then visit http://localhost:8000
 ```
 
----
+Third-party licences: KaTeX (MIT) in `static/vendor/katex/LICENSE`; the three
+typefaces (SIL OFL 1.1) in `static/fonts/LICENSE-*`.
 
-## Project Structure
+## Colours
 
-```
-RF-LEGO/
-├── src/rflego/
-│   ├── __init__.py          # Main exports
-│   ├── config.py            # Dataclass configurations
-│   ├── utils.py             # Logging & utilities
-│   ├── data/                # Dataset modules
-│   │   ├── base.py          # Base dataset class
-│   │   └── datasets.py      # Dataset implementations
-│   ├── trainer/             # Trainer
-│   │   └── trainer.py       # BaseTrainer class
-│   └── modules/             # Deep unrolling modules
-│       ├── base.py          # Base model and blocks
-│       ├── ft.py            # RF-LEGO FT
-│       ├── beamformer.py    # RF-LEGO Beamformer
-│       └── detector.py      # RF-LEGO Detector
-├── pyproject.toml           # Project configuration
-└── README.md
-```
+The palette is sampled from the three bricks in Fig. 1 of the paper, and each
+brick owns one module — matching the colour coding of the paper's own module
+figures:
 
----
+| | hex | module |
+|---|---|---|
+| yellow | `#FFC001` | RF-LEGO FT |
+| blue | `#0070C0` | RF-LEGO Beamformer |
+| green | `#00B050` | RF-LEGO Detector |
 
-## Quick Start
+The blue also serves as the link/UI accent — it is the only one of the three that
+clears WCAG AA as text on the paper background. Yellow and green appear as fills,
+borders and tints only.
 
-### RF-LEGO FT
+## Assets
 
-```python
-import torch
-from rflego import FrequencyTransformConfig, FrequencyTransformModel
+Figures are regenerated from the paper's LaTeX sources; text is pre-converted to
+paths, so the SVGs carry no font dependency:
 
-# Configure and create model
-config = FrequencyTransformConfig(
-    sequence_length=256,
-    num_conv_layers=6
-)
-model = FrequencyTransformModel(config)
-
-# Forward pass (separate real/imag inputs)
-x_real = torch.randn(32, 256)
-x_imag = torch.randn(32, 256)
-y_real, y_imag = model(x_real, x_imag)
+```bash
+pdftocairo -svg fig.pdf fig.svg
 ```
 
-### RF-LEGO Beamformer
+The teaser is transcoded from the 4K source to the most broadly supported web
+profile (H.264 High L4.0, yuv420p, AAC-LC, `moov` up front):
 
-```python
-import torch
-from rflego import BeamformerConfig, BeamformerModel
-
-# Configure and create model
-config = BeamformerConfig(
-    dict_length=121,  # 1-degree resolution over 120 degrees
-    num_layers=10     # ADMM iterations
-)
-model = BeamformerModel(config)
-
-# Forward pass
-y = torch.randn(32, 8, dtype=torch.complex64)      # Measurements: (batch, num_antennas)
-A = torch.randn(32, 8, 121, dtype=torch.complex64) # Steering matrix
-spectrum = model(y, A)  # DoA spectrum: (batch, dict_length)
+```bash
+ffmpeg -i teaser_video_rflego.mov \
+  -vf "scale=1920:-2:flags=lanczos,fps=30" \
+  -c:v libx264 -profile:v high -level 4.0 -pix_fmt yuv420p -crf 23 \
+  -c:a aac -b:a 64k -ac 1 -ar 48000 -movflags +faststart \
+  static/video/teaser_rflego.mp4
 ```
 
-### RF-LEGO Detector
+## Publishing on GitHub Pages
 
-```python
-import torch
-from rflego import DetectorConfig, DetectorModel
+Settings → Pages → *Deploy from a branch* → branch `website`, folder `/ (root)`.
+The site then serves at `https://aiot-lab.github.io/RF-LEGO/`.
 
-# Configure and create model
-config = DetectorConfig(
-    num_layers=2,
-    hidden_dim=256,
-    order=256,
-    dropout=0.2
-)
-model = DetectorModel(config)
-
-# Forward pass: (sequence_length, batch_size)
-x = torch.randn(1024, 32)
-logits = model(x)  # Output: (1024, 32)
-```
-
----
-
-## Training
-
-RF-LEGO provides a flexible `BaseTrainer` class for training:
-
-```python
-from rflego import BaseTrainer, TrainerConfig
-from torch.utils.data import DataLoader
-
-class DetectorTrainer(BaseTrainer):
-    def compute_loss(self, batch):
-        inputs = batch['input'].to(self.device)
-        labels = batch['labels'].to(self.device)
-        
-        # Reshape and forward
-        x = inputs.squeeze(1).permute(1, 0)
-        logits = self.model(x)
-        
-        loss = torch.nn.functional.binary_cross_entropy_with_logits(
-            logits.permute(1, 0), labels
-        )
-        return loss, {"loss": loss.item()}
-
-# Setup and train
-config = TrainerConfig(
-    batch_size=512,
-    learning_rate=1e-3,
-    epochs=100
-)
-trainer = DetectorTrainer(model, config, train_loader, val_loader)
-trainer.fit()
-```
-
----
+All asset paths are relative, so the page also works from a subdirectory or from
+the local filesystem.
 
 ## Citation
 
 ```bibtex
-@INPROCEEDINGS{luca2026mobicom_rflego,
-  author={Luca Jiang-Tao Yu and Chenshu Wu},
-  booktitle={ACM International Conference on Mobile Computing and Networking},
-  title={RF-LEGO: Modularized Signal Processing-Deep Learning Co-Design for RF Sensing via Deep Unrolling},
-  pages={},
-  month={Oct},
-  year={2026},
+@inproceedings{luca2026mobicom_rflego,
+  author    = {Luca Jiang-Tao Yu and Chenshu Wu},
+  title     = {{RF-LEGO}: Modularized Signal Processing-Deep Learning
+               Co-Design for {RF} Sensing via Deep Unrolling},
+  booktitle = {The 32nd Annual International Conference on Mobile
+               Computing and Networking (MobiCom '26)},
+  year      = {2026},
+  month     = {Oct},
+  address   = {Austin, TX, USA},
+  publisher = {ACM},
+  doi       = {10.1145/3795866.3796683}
 }
 ```
