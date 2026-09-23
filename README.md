@@ -176,3 +176,16 @@ trainer.fit()
   year={2026},
 }
 ```
+
+---
+
+<p align="center">
+  <a href="https://www.acm.org/publications/policies/artifact-review-and-badging-current"><img src="assets/badges/acm_artifacts_available_v1_1.png" alt="ACM Artifacts Available v1.1" height="96"></a>
+  <a href="https://www.acm.org/publications/policies/artifact-review-and-badging-current"><img src="assets/badges/acm_artifacts_evaluated_functional_v1_1.png" alt="ACM Artifacts Evaluated - Functional v1.1" height="96"></a>
+  <a href="https://www.acm.org/publications/policies/artifact-review-and-badging-current"><img src="assets/badges/acm_artifacts_evaluated_reusable_v1_1.png" alt="ACM Artifacts Evaluated - Reusable v1.1" height="96"></a>
+  <a href="https://www.acm.org/publications/policies/artifact-review-and-badging-current"><img src="assets/badges/acm_results_reproduced_v1_1.png" alt="ACM Results Reproduced v1.1" height="96"></a>
+</p>
+
+<p align="center">
+  <em>This artifact received all four ACM reproducibility badges — <strong>Artifacts Available</strong>, <strong>Functional</strong>, <strong>Reusable</strong>, and <strong>Results Reproduced</strong> — from the MobiCom 2026 Artifact Evaluation Committee.</em>
+</p>
