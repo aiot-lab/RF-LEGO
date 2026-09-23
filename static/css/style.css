@@ -310,6 +310,23 @@ h1.title {
 .btn--ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
 .btn--ghost:hover { border-color: var(--ink-3); }
 
+.artifact-awards {
+  padding: 0 1.25rem 3rem; text-align: center;
+}
+.artifact-awards h2 {
+  margin: 0; font-family: var(--serif); font-size: 1.35rem;
+}
+.artifact-awards p {
+  max-width: 44rem; margin: .45rem auto 0; color: var(--ink-3);
+  font-family: var(--sans); font-size: .86rem;
+}
+.artifact-badges {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem;
+  margin-top: 1.25rem;
+}
+.artifact-badges a { display: block; border-radius: 50%; }
+.artifact-badges img { display: block; width: 6rem; height: 6rem; }
+
 /* ---------- headings ---------- */
 
 h2.h {
