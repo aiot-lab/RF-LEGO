@@ -21,6 +21,8 @@
 The University of Hong Kong
 </div>
 
+<p align="center"><strong>🏆 ACM MobiCom 2026 Best Community Paper Award</strong></p>
+
 The official implementation of RF-LEGO: Modularized Signal Processing-Deep Learning Co-Design for RF Sensing via Deep Unrolling, accepted by ACM Mobicom 2026, Austin, TX, USA.
 
 ---
