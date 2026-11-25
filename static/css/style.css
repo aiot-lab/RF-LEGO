@@ -280,7 +280,7 @@ h1.title {
   margin: 0 0 1.6rem;
 }
 .award {
-  display: inline-flex; align-items: center; justify-content: center; gap: .48rem;
+  display: inline-flex; align-items: center; justify-content: center;
   max-width: 100%;
   font-family: var(--sans); font-size: .82rem; font-weight: 600;
   letter-spacing: .015em; line-height: 1.35;
@@ -291,14 +291,6 @@ h1.title {
   border-radius: 100px;
   box-shadow: var(--shadow-sm);
 }
-.award svg {
-  width: 15px; height: 15px; flex: none;
-  color: color-mix(in srgb, var(--lego-y) 75%, #8A5A00);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .award svg { color: var(--lego-y); }
-}
-:root[data-theme="dark"] .award svg { color: var(--lego-y); }
 
 .authors {
   font-family: var(--sans); font-size: .97rem; font-weight: 500;
