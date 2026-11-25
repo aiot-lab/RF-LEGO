@@ -190,6 +190,6 @@ class AmplitudeThreshold(nn.Module):
         else:
             # Assume separate real/imag channels
             real, imag = x[..., 0, :], x[..., 1, :]
-            amplitude = torch.sqrt(real**2 + imag**2)
+            amplitude = torch.sqrt(real**2 + imag**2 + 1e-12)
             mask = torch.sigmoid(self.alpha * (amplitude - self.threshold))
             return x * mask.unsqueeze(-2)

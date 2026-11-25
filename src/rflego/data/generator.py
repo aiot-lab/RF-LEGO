@@ -261,15 +261,21 @@ def generate_detector_batch(
 
         prof = _cnoise(rng, L, sigma_l)
 
+        if L < 16:
+            raise ValueError(f"Sequence length L={L} must be at least 16")
+
         if c == 3:
-            b0 = int(rng.integers(20, L - 30))
+            lo3 = 20 if L >= 64 else max(2, L // 4)
+            hi3 = (L - 30) if L >= 64 else max(lo3 + 1, L - 6)
+            b0 = int(rng.integers(lo3, hi3))
             sep = int(rng.integers(3, 6))
             centers = [b0, min(b0 + sep, L - 2)]
         elif c == 2:
             centers = [min(clutter_bounds[i, 0] + int(rng.integers(2, 6)), L - 2)]
         else:
             k = int(rng.integers(1, 6)) if c in (0, 1) else 1
-            centers = sorted(int(rng.integers(8, L - 8)) for _ in range(k))
+            margin = 8 if L >= 24 else 2
+            centers = sorted(int(rng.integers(margin, L - margin)) for _ in range(k))
 
         for j, b in enumerate(centers[:5]):
             local_sigma = sigma_l[b]
@@ -281,8 +287,9 @@ def generate_detector_batch(
         n_targets[i] = len(centers)
 
         if c == 4:
+            spike_margin = 5 if L >= 16 else 1
             for _ in range(int(rng.integers(2, 4))):
-                bs = int(rng.integers(5, L - 5))
+                bs = int(rng.integers(spike_margin, L - spike_margin))
                 if gt_mask[bs, i] == 0:
                     prof[bs] += rng.uniform(3.0, 5.0) * np.exp(1j * rng.uniform(0, 2 * np.pi))
 
@@ -386,9 +393,7 @@ class FtDataGenerator:
                 "clean_signal": np.fft.ifft(clean_spectrum).astype(np.complex64),
             }
             self.save_data(data_dict, is_train=(i < num_train), idx=i)
-        logger.info(
-            f"FT dataset saved to {self.save_dir} in {time.time() - start_time:.2f}s"
-        )
+        logger.info(f"FT dataset saved to {self.save_dir} in {time.time() - start_time:.2f}s")
 
 
 class BeamformerDataGenerator:
@@ -475,9 +480,9 @@ class BeamformerDataGenerator:
         """Create the ULA steering dictionary across angle_range."""
         angles = torch.linspace(self.angle_range[0], self.angle_range[1], self.dictionary_length)
         freqs = -self.gamma * torch.sin(torch.deg2rad(angles))
-        steering = torch.exp(
-            1j * 2 * torch.pi * self.array.unsqueeze(-1) * freqs.unsqueeze(0)
-        ).to(torch.complex64)
+        steering = torch.exp(1j * 2 * torch.pi * self.array.unsqueeze(-1) * freqs.unsqueeze(0)).to(
+            torch.complex64
+        )
         metadata = {
             "array_type": "ULA",
             "num_elements": self.num_elements,

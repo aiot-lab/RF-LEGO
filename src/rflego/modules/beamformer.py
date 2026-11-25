@@ -108,8 +108,9 @@ class BeamformerModel(BaseModel):
             [BeamformerLayer(config.dict_length) for _ in range(config.num_layers)]
         )
 
-        # Complex-valued batch normalization
+        # Complex-valued batch normalization and dropout
         self.bn = ComplexBatchNorm(config.dict_length, affine=False)
+        self.dropout = nn.Dropout(config.dropout)
 
         # Learnable amplitude thresholding
         self.threshold = AmplitudeThreshold(init_threshold=0.1, init_alpha=2.0)
@@ -137,8 +138,9 @@ class BeamformerModel(BaseModel):
         y_3d = y.unsqueeze(-1)  # [B, num_elements, 1]
         A_H_y = torch.matmul(A_H, y_3d).squeeze(-1)  # [B, dict_length]
 
-        # Apply complex batch normalization
+        # Apply complex batch normalization and phase-preserving dropout
         A_H_y = self.bn(A_H_y)
+        A_H_y = A_H_y * self.dropout(torch.ones_like(A_H_y.real))
 
         # Initialize ADMM variables
         z = torch.zeros_like(A_H_y)

@@ -127,8 +127,8 @@ config = DetectorConfig(
 model = DetectorModel(config)
 
 # Forward pass: (sequence_length, batch_size)
-x = torch.randn(1024, 32)
-logits = model(x)  # Output: (1024, 32)
+x = torch.randn(128, 32)
+logits = model(x)  # Output: (128, 32)
 ```
 
 ---
@@ -138,24 +138,30 @@ logits = model(x)  # Output: (1024, 32)
 RF-LEGO provides a flexible `BaseTrainer` class for training:
 
 ```python
-from rflego import BaseTrainer, TrainerConfig
+import torch
 from torch.utils.data import DataLoader
+from rflego import BaseTrainer, DetectorConfig, DetectorModel, TrainerConfig, create_dataset
 
 class DetectorTrainer(BaseTrainer):
     def compute_loss(self, batch):
         inputs = batch['input'].to(self.device)
         labels = batch['labels'].to(self.device)
-        
+
         # Reshape and forward
         x = inputs.squeeze(1).permute(1, 0)
         logits = self.model(x)
-        
+
         loss = torch.nn.functional.binary_cross_entropy_with_logits(
             logits.permute(1, 0), labels
         )
         return loss, {"loss": loss.item()}
 
+# Build synthetic datasets and dataloaders
+train_loader = DataLoader(create_dataset("detector", n=2048, seed=42), batch_size=512, shuffle=True)
+val_loader = DataLoader(create_dataset("detector", n=512, seed=43), batch_size=512)
+
 # Setup and train
+model = DetectorModel(DetectorConfig(num_layers=2, hidden_dim=256, order=256))
 config = TrainerConfig(
     batch_size=512,
     learning_rate=1e-3,
@@ -170,13 +176,13 @@ trainer.fit()
 ## Citation
 
 ```bibtex
-@INPROCEEDINGS{luca2026mobicom_rflego,
-  author={Luca Jiang-Tao Yu and Chenshu Wu},
-  booktitle={ACM International Conference on Mobile Computing and Networking},
+@inproceedings{yu2026rf,
   title={RF-LEGO: Modularized Signal Processing-Deep Learning Co-Design for RF Sensing via Deep Unrolling},
-  pages={},
-  month={Oct},
-  year={2026},
+  author={Yu, Luca Jiang-Tao and Wu, Chenshu},
+  booktitle={Proceedings of the 32nd Annual International Conference on Mobile Computing and Networking},
+  pages={178--193},
+  doi={10.1145/3795866.3796683},
+  year={2026}
 }
 ```
 

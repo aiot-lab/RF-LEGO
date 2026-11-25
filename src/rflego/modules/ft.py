@@ -159,7 +159,6 @@ class FrequencyTransformModel(BaseModel):
     def __init__(self, config: FrequencyTransformConfig) -> None:
         super().__init__(config)
         self.N = config.sequence_length
-        self.device = config.device
 
         # Precompute and initialize chirp factors for Bluestein's FFT
         n = np.arange(self.N)
@@ -176,8 +175,9 @@ class FrequencyTransformModel(BaseModel):
         # Initialize convolution weights with chirp factors
         self._initialize_chirp_weights()
 
-        # Activation function
+        # Activation function and dropout
         self.activation = ComplexActivation(activation_type="tanh")
+        self.dropout = nn.Dropout(config.dropout)
 
         # Learnable amplitude thresholding
         self.threshold = AmplitudeThreshold(init_threshold=0.1, init_alpha=2.0)
@@ -212,7 +212,7 @@ class FrequencyTransformModel(BaseModel):
         # Create complex tensor and apply chirp multiplication
         x = torch.complex(x_real, x_imag)
         x_chirp = x * torch.conj(self.chirp_tensor.to(device))
-        
+
         # Zero-padding for Bluestein's algorithm
         x_padded = torch.zeros(x.shape[0], self.N, dtype=torch.complex64, device=device)
         x_padded[:, : self.N] = x_chirp
@@ -227,6 +227,8 @@ class FrequencyTransformModel(BaseModel):
             y_ri = conv_layer(y_ri)
             if i < len(self.conv_layers) - 1:  # No activation after last layer
                 y_ri = self.activation(y_ri)
+                mask = self.dropout(torch.ones_like(y_ri[:, :1, :]))
+                y_ri = y_ri * mask
 
         # Convert back to complex and apply final chirp correction
         y = torch.complex(y_ri[:, 0, :], y_ri[:, 1, :])
@@ -238,7 +240,7 @@ class FrequencyTransformModel(BaseModel):
         y_imag = y_corrected.imag.unsqueeze(1)
 
         # Apply learnable amplitude-based masking
-        amplitude = torch.sqrt(y_real**2 + y_imag**2)
+        amplitude = torch.sqrt(y_real**2 + y_imag**2 + 1e-12)
         mask = torch.sigmoid(self.threshold.alpha * (amplitude - self.threshold.threshold))
         y_real = y_real * mask
         y_imag = y_imag * mask
