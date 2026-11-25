@@ -261,14 +261,44 @@ h1.title {
 }
 .subtitle {
   font-family: var(--serif);
-  font-size: clamp(1.02rem, 2.2vw, 1.26rem);
+  font-size: clamp(.98rem, 1.9vw, 1.24rem);
   line-height: 1.45;
   color: var(--ink-2);
   font-style: italic;
-  margin: 0 auto 2rem;
-  max-width: 40rem;
-  text-wrap: balance;
+  margin: 0 auto 1.25rem;
+  max-width: none;
+  white-space: nowrap;
 }
+@media (max-width: 920px) {
+  .subtitle {
+    white-space: normal;
+    text-wrap: balance;
+  }
+}
+
+.award-wrap {
+  margin: 0 0 1.6rem;
+}
+.award {
+  display: inline-flex; align-items: center; justify-content: center; gap: .48rem;
+  max-width: 100%;
+  font-family: var(--sans); font-size: .82rem; font-weight: 600;
+  letter-spacing: .015em; line-height: 1.35;
+  color: var(--ink);
+  background: var(--lego-y-soft);
+  border: 1px solid color-mix(in srgb, var(--lego-y) 72%, var(--rule));
+  padding: .38rem .95rem;
+  border-radius: 100px;
+  box-shadow: var(--shadow-sm);
+}
+.award svg {
+  width: 15px; height: 15px; flex: none;
+  color: color-mix(in srgb, var(--lego-y) 75%, #8A5A00);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .award svg { color: var(--lego-y); }
+}
+:root[data-theme="dark"] .award svg { color: var(--lego-y); }
 
 .authors {
   font-family: var(--sans); font-size: .97rem; font-weight: 500;
