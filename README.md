@@ -39,7 +39,7 @@ Wireless sensing, traditionally relying on signal processing (SP) techniques, ha
 ## Installation
 
 ```bash
-$ git clone https://github.com/1ucayu/RF-LEGO.git
+$ git clone https://github.com/aiot-lab/RF-LEGO.git
 $ cd RF-LEGO
 $ uv sync
 ```
