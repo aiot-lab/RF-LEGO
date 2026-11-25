@@ -29,8 +29,7 @@ class BeamformerLayer(nn.Module):
         # Learnable diagonal approximation of ADMM weight matrix
         self.w_diag = nn.Parameter(0.01 * torch.randn(dict_length, dtype=torch.cfloat))
 
-        # Learnable ADMM parameters
-        self.beta = nn.Parameter(torch.tensor(0.01, dtype=torch.float32))
+        # Learnable ADMM penalty parameter
         self.raw_eta = nn.Parameter(torch.log(torch.tensor(1.0, dtype=torch.float32)))
 
         # GRU-style update gate parameters for complex-valued gating
@@ -55,20 +54,13 @@ class BeamformerLayer(nn.Module):
         Returns:
             Tuple of (x, z, v) - Updated primal, sparse, and dual variables.
         """
-        B, N = A_H_y.shape
-
         # Compute learnable penalty parameter with stability
         eta = F.softplus(self.raw_eta)
 
-        # Construct batched diagonal weight matrix
-        w_diag_batch = self.w_diag.unsqueeze(0).expand(B, N)
-        W = torch.diag_embed(w_diag_batch)
-        I = torch.eye(N, device=W.device, dtype=W.dtype).unsqueeze(0).expand(B, N, N)
-
         # ADMM x-update: solve (W + eta*I)x = A^H y + eta*(z - v)
-        W_eta_inv = torch.inverse(W + eta * I)
+        # W is diagonal by construction, so the exact solve is elementwise
         B_term = A_H_y + eta * (z_prev - v_prev)
-        x = torch.matmul(W_eta_inv, B_term.unsqueeze(-1)).squeeze(-1)
+        x = B_term / (self.w_diag.unsqueeze(0) + eta)
 
         # Compute gating input
         u = x + v_prev

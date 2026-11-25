@@ -12,7 +12,7 @@ keywords = ["rf", "signal-processing", "deep-learning", "beamforming", "doa", "p
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -38,8 +38,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/1ucayu/RF-LEGO"
-Repository = "https://github.com/1ucayu/RF-LEGO"
+Homepage = "https://github.com/aiot-lab/RF-LEGO"
+Repository = "https://github.com/aiot-lab/RF-LEGO"
 
 [build-system]
 requires = ["hatchling"]

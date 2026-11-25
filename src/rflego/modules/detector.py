@@ -240,13 +240,17 @@ class LegTTransition(AdaptiveTransition):
         if transpose:
             _A = _A.transpose(-1, -2)
 
-        # Batched solve to avoid memory issues
-        xs = []
-        for _A_, u_ in zip(*torch.broadcast_tensors(_A, u.unsqueeze(-1))):
-            x_ = torch.linalg.solve(_A_, u_[..., :1]).squeeze(-1)
-            xs.append(x_)
-        x = torch.stack(xs, dim=0)
-        return x
+        # Fold extra leading dimensions into the RHS so each matrix is factorized once
+        batch = _A.shape[:-2]
+        n_extra = max(0, u.dim() - 1 - len(batch))
+        extra = u.shape[:n_extra]
+        target_batch = torch.broadcast_shapes(batch, u.shape[n_extra:-1])
+        if target_batch != batch:
+            _A = _A.expand(*target_batch, self.N, self.N)
+        u_expanded = u.expand(*extra, *target_batch, self.N)
+        rhs = u_expanded.reshape(-1, *target_batch, self.N).movedim(0, -1)
+        x = torch.linalg.solve(_A, rhs)
+        return x.movedim(-1, 0).reshape(*extra, *target_batch, self.N)
 
 
 class StateSpaceLayer(nn.Module):

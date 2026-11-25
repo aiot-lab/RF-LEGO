@@ -123,13 +123,15 @@ class SchedulerConfig:
         scheduler_type: Type of scheduler ('step', 'cosine', 'linear').
         step_size: Step size for StepLR scheduler.
         gamma: Multiplicative factor for StepLR.
-        t_max: Maximum number of iterations for CosineAnnealingLR.
+        t_max: Maximum number of iterations for CosineAnnealingLR / LinearLR.
+            If None, defaults to total training iterations (epochs * len(train_loader)
+            for epoch-based training, or total_steps for step-based training).
     """
 
     scheduler_type: Literal["step", "cosine", "linear"] = "step"
     step_size: int = 1000
     gamma: float = 0.9
-    t_max: int = 100
+    t_max: int | None = None
 
 
 @dataclass

@@ -13,7 +13,7 @@ from pathlib import Path
 
 import torch
 from torch.optim import AdamW, Optimizer
-from torch.optim.lr_scheduler import CosineAnnealingLR, LRScheduler, StepLR
+from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, LRScheduler, StepLR
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
@@ -71,8 +71,11 @@ class BaseTrainer(ABC):
         # Setup optimizer
         self.optimizer = self._create_optimizer()
 
-        # Setup scheduler (will be set by subclass or default)
-        self.scheduler: LRScheduler | None = None
+        # Setup scheduler from config if provided
+        scheduler_cfg = getattr(config, "scheduler", None)
+        self.scheduler: LRScheduler | None = (
+            self._create_scheduler(scheduler_cfg) if scheduler_cfg is not None else None
+        )
 
         # Setup directories and logging
         self.checkpoint_name = self._generate_checkpoint_name()
@@ -100,15 +103,38 @@ class BaseTrainer(ABC):
             weight_decay=self.config.weight_decay,
         )
 
-    def _create_scheduler(self, scheduler_config: SchedulerConfig) -> LRScheduler:
+    def _resolve_total_iters(
+        self, scheduler_config: SchedulerConfig, *, step_mode: bool = False
+    ) -> int:
+        """Resolve total scheduler iterations when t_max is not explicitly specified."""
+        if scheduler_config.t_max is not None:
+            return scheduler_config.t_max
+        if step_mode:
+            return max(1, self.config.total_steps)
+        try:
+            steps_per_epoch = len(self.train_loader)
+        except TypeError:
+            steps_per_epoch = 0
+        if steps_per_epoch > 0:
+            return max(1, steps_per_epoch * self.config.epochs)
+        return max(1, self.config.total_steps)
+
+    def _create_scheduler(
+        self,
+        scheduler_config: SchedulerConfig,
+        *,
+        step_mode: bool = False,
+    ) -> LRScheduler:
         """Create learning rate scheduler based on configuration.
 
         Args:
             scheduler_config: Scheduler configuration.
+            step_mode: If True, resolve default t_max from config.total_steps.
 
         Returns:
             Configured scheduler instance.
         """
+        total_iters = self._resolve_total_iters(scheduler_config, step_mode=step_mode)
         if scheduler_config.scheduler_type == "step":
             return StepLR(
                 self.optimizer,
@@ -118,7 +144,14 @@ class BaseTrainer(ABC):
         elif scheduler_config.scheduler_type == "cosine":
             return CosineAnnealingLR(
                 self.optimizer,
-                T_max=scheduler_config.t_max,
+                T_max=total_iters,
+            )
+        elif scheduler_config.scheduler_type == "linear":
+            return LinearLR(
+                self.optimizer,
+                start_factor=1.0,
+                end_factor=0.0,
+                total_iters=total_iters,
             )
         else:
             raise ValueError(f"Unknown scheduler type: {scheduler_config.scheduler_type}")
@@ -336,6 +369,15 @@ class BaseTrainer(ABC):
 
         Runs training for a fixed number of steps with periodic validation.
         """
+        scheduler_cfg = getattr(self.config, "scheduler", None)
+        if (
+            self.global_step == 0
+            and scheduler_cfg is not None
+            and scheduler_cfg.t_max is None
+            and scheduler_cfg.scheduler_type in ("cosine", "linear")
+        ):
+            self.scheduler = self._create_scheduler(scheduler_cfg, step_mode=True)
+
         logger.info(f"Starting training for {self.config.total_steps} steps")
 
         while self.global_step < self.config.total_steps:
