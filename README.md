@@ -54,9 +54,10 @@ RF-LEGO/
 │   ├── __init__.py          # Main exports
 │   ├── config.py            # Dataclass configurations
 │   ├── utils.py             # Logging & utilities
-│   ├── data/                # Dataset modules
+│   ├── data/                # Dataset & synthetic generator modules
 │   │   ├── base.py          # Base dataset class
-│   │   └── datasets.py      # Dataset implementations
+│   │   ├── dataset.py       # Dataset implementations
+│   │   └── generator.py     # Synthetic data generators
 │   ├── trainer/             # Trainer
 │   │   └── trainer.py       # BaseTrainer class
 │   └── modules/             # Deep unrolling modules

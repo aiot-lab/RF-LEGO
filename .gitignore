@@ -68,8 +68,8 @@ checkpoints/
 *.ckpt
 
 # Data (add your data directories)
-data/
-datasets/
+/data/
+/datasets/
 
 # Legacy code backup (optional - remove this line if you want to keep it in git)
 # legacy_backup/
